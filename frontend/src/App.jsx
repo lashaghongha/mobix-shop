@@ -24,6 +24,7 @@ import AdminProductForm from './admin/AdminProductForm';
 import AdminCategories from './admin/AdminCategories';
 import AdminUsers from './admin/AdminUsers';
 import Wishlist from './pages/Wishlist';
+import Profile from './pages/Profile';
 
 function ShopRoutes() {
   return (
@@ -40,6 +41,7 @@ function ShopRoutes() {
           <Route path="/order/:id" element={<OrderConfirmation />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </main>
       <Footer />
