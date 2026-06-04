@@ -1,0 +1,125 @@
+.cat-page {
+  display: flex;
+  min-height: calc(100vh - 120px);
+  background: #f3f4f6;
+  animation: catPageIn .55s cubic-bezier(.16,1,.3,1);
+}
+@keyframes catPageIn {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Sidebar ── */
+.cat-sidebar {
+  width: 100px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.cat-side-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all .15s;
+  text-align: center;
+}
+.cat-side-item:hover {
+  background: #fff1f2;
+  border-left-color: #c0152a;
+}
+.cat-side-item.active {
+  background: #fff1f2;
+  border-left-color: #c0152a;
+}
+.cat-side-icon { font-size: 26px; }
+.cat-side-name {
+  font-size: 10px;
+  color: #333;
+  line-height: 1.2;
+  word-break: keep-all;
+}
+.cat-side-item.active .cat-side-name { color: #c0152a; font-weight: 600; }
+
+/* ── Content ── */
+.cat-content {
+  flex: 1;
+  padding: 12px 12px 80px;
+  overflow-y: auto;
+}
+
+.cat-group {
+  margin-bottom: 20px;
+}
+.cat-group-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 10px;
+}
+
+.cat-group-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.cat-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #333;
+  font-size: 11px;
+  text-align: center;
+  transition: box-shadow .2s;
+}
+.cat-tile:hover { box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+.cat-tile img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+.cat-tile span {
+  padding: 6px 4px;
+  line-height: 1.3;
+  font-size: 11px;
+}
+
+.see-all-tile {
+  background: #fff;
+  border: 2px dashed #c0152a;
+}
+.cat-see-all-inner {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff1f2;
+}
+.cat-see-all-text {
+  color: #c0152a !important;
+  font-size: 13px !important;
+  font-weight: 700;
+  padding: 0 !important;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Desktop: hide categories page, it's mobile only */
+@media (min-width: 769px) {
+  .cat-page { display: none; }
+}

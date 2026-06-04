@@ -1,0 +1,312 @@
+/* ── Root layout ─────────────────────────────────────────────────────────── */
+.au-root {
+  display: flex;
+  gap: 0;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── List panel ──────────────────────────────────────────────────────────── */
+.au-list-panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: flex 0.25s;
+}
+.au-list-panel--shrink {
+  flex: 0 0 52%;
+  max-width: 52%;
+}
+
+.au-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 0 18px;
+  flex-wrap: wrap;
+}
+.au-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+}
+.au-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+.au-count {
+  background: #f3f4f6;
+  color: #555;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+.au-search-wrap {
+  position: relative;
+  flex: 0 0 240px;
+}
+.au-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+}
+.au-search {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+.au-search:focus { border-color: #c0152a; }
+
+/* Spinner / empty */
+.au-spinner {
+  padding: 60px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+.au-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 20px;
+  color: #bbb;
+}
+.au-empty p { margin: 0; font-size: 14px; }
+
+/* Table */
+.au-table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+}
+.au-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.au-table th {
+  background: #f9fafb;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+.au-th-num { text-align: right; }
+.au-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.au-row:hover { background: #fafafa; }
+.au-row--active { background: #fff5f5; }
+.au-table td { padding: 11px 14px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+.au-table tr:last-child td { border-bottom: none; }
+
+.au-user-cell { display: flex; align-items: center; gap: 10px; }
+.au-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #c0152a;
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.au-name { font-weight: 600; color: #111; font-size: 13px; }
+.au-email { color: #888; font-size: 12px; margin-top: 1px; }
+.au-phone, .au-city { color: #555; font-size: 13px; }
+.au-td-num { text-align: right; }
+.au-badge-orders {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+.au-total { font-weight: 600; color: #111; }
+.au-date { color: #888; font-size: 12px; }
+.au-chevron { color: #ccc; }
+
+/* Pagination */
+.au-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 14px 0 0;
+}
+.au-pagination button {
+  padding: 6px 16px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.au-pagination button:disabled { opacity: 0.35; cursor: not-allowed; }
+.au-pagination span { font-size: 13px; color: #666; }
+
+/* ── Detail panel ────────────────────────────────────────────────────────── */
+.au-detail-panel {
+  flex: 0 0 46%;
+  max-width: 46%;
+  border-left: 1.5px solid #f0f0f0;
+  padding: 0 0 0 24px;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.au-detail-close {
+  position: absolute;
+  top: 0; right: 0;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #999;
+  padding: 4px 8px;
+}
+.au-detail-close:hover { color: #333; }
+
+/* Profile card */
+.au-profile-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 4px 0 20px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 20px;
+}
+.au-profile-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: #c0152a;
+  color: #fff;
+  font-weight: 800;
+  font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.au-profile-name { font-size: 17px; font-weight: 700; color: #111; }
+.au-profile-email { font-size: 13px; color: #c0152a; margin: 2px 0; }
+.au-profile-sub { font-size: 12px; color: #777; margin-top: 1px; }
+
+/* Stats */
+.au-stats-row {
+  display: flex;
+  gap: 0;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.au-stat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-right: 1px solid #f0f0f0;
+}
+.au-stat:last-child { border-right: none; }
+.au-stat-icon { color: #c0152a; flex-shrink: 0; }
+.au-stat-val { font-size: 16px; font-weight: 700; color: #111; }
+.au-stat-lbl { font-size: 11px; color: #888; margin-top: 1px; }
+
+/* Orders history */
+.au-orders-section { flex: 1 1 auto; }
+.au-orders-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 12px;
+}
+.au-orders-list { display: flex; flex-direction: column; gap: 10px; }
+.au-order-card {
+  border: 1.5px solid #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.au-order-card:hover { border-color: #ddd; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+
+.au-order-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+.au-order-id { font-weight: 700; font-size: 13px; color: #111; }
+.au-order-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 12px;
+}
+.au-order-date { margin-left: auto; font-size: 12px; color: #888; }
+
+.au-order-items { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
+.au-order-item { display: flex; align-items: center; gap: 10px; }
+.au-item-img {
+  width: 38px; height: 38px;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  background: #fff;
+  flex-shrink: 0;
+}
+.au-item-name { font-size: 12px; font-weight: 500; color: #222; }
+.au-item-meta { font-size: 11px; color: #888; margin-top: 2px; }
+
+.au-order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+  font-size: 12px;
+  color: #888;
+}
+.au-order-total { font-weight: 700; font-size: 14px; color: #111; }
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .au-root { flex-direction: column; overflow: visible; }
+  .au-list-panel, .au-list-panel--shrink { flex: unset; max-width: 100%; }
+  .au-detail-panel {
+    flex: unset;
+    max-width: 100%;
+    border-left: none;
+    border-top: 2px solid #f0f0f0;
+    padding: 20px 0 0;
+  }
+  .au-stats-row { flex-wrap: wrap; }
+  .au-stat { flex: 1 1 45%; }
+  .au-search-wrap { flex: 1 1 100%; }
+}

@@ -1,0 +1,72 @@
+.skel-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1.5px solid #eee;
+  overflow: hidden;
+  flex-shrink: 0;
+  width: 200px;
+}
+
+.skel-img {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f0f0f0;
+}
+
+.skel-body {
+  padding: 10px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skel-line {
+  height: 10px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  width: 100%;
+}
+.skel-line.short { width: 45%; height: 8px; }
+
+.skel-price {
+  height: 22px;
+  width: 60%;
+  background: #f0f0f0;
+  border-radius: 6px;
+  margin-top: 2px;
+}
+
+.skel-btn {
+  height: 34px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+
+/* shimmer sweep */
+.skel-shine {
+  position: relative;
+  overflow: hidden;
+}
+.skel-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.7) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@media (max-width: 768px) {
+  .skel-card { width: 160px; }
+}

@@ -1,0 +1,130 @@
+.compare-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 2px solid #c0152a;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.12);
+  z-index: 500;
+  animation: slideUpBar .3s cubic-bezier(.16,1,.3,1);
+}
+@keyframes slideUpBar {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.compare-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+/* ── Slots ── */
+.compare-slots {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+}
+
+.compare-slot {
+  flex: 1;
+  max-width: 160px;
+  height: 56px;
+  border: 1.5px dashed #ddd;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: #fafafa;
+  transition: border-color .2s;
+}
+.compare-slot.filled {
+  border-style: solid;
+  border-color: #e8e8e8;
+  background: #fff;
+  gap: 8px;
+  padding: 6px 28px 6px 8px;
+}
+.compare-slot img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  flex-shrink: 0;
+}
+.compare-slot-name {
+  font-size: 11px;
+  color: #333;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+}
+.compare-slot-empty {
+  font-size: 12px;
+  color: #bbb;
+  font-weight: 500;
+}
+.compare-slot-remove {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: #eee;
+  color: #888;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+}
+.compare-slot-remove:hover { background: #c0152a; color: #fff; }
+
+/* ── Actions ── */
+.compare-bar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.compare-clear-btn {
+  padding: 7px 14px;
+  border: 1.5px solid #eee;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.compare-clear-btn:hover { border-color: #c0152a; color: #c0152a; }
+.compare-go-btn {
+  padding: 9px 18px;
+  background: #c0152a;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+  transition: background .2s;
+}
+.compare-go-btn:hover { background: #96101f; }
+
+/* Mobile */
+@media (max-width: 640px) {
+  .compare-bar-inner { padding: 10px 12px; gap: 10px; }
+  .compare-slot { max-width: none; height: 48px; }
+  .compare-slot.filled { padding: 6px 24px 6px 6px; gap: 6px; }
+  .compare-slot img { width: 32px; height: 32px; }
+  .compare-slot-name { font-size: 10px; }
+  .compare-bar-actions { flex-direction: row; align-items: center; }
+  .compare-clear-btn { display: none; }
+}
