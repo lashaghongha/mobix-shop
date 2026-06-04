@@ -167,8 +167,8 @@ export default function ProductDetail() {
   const { addToCart, loading } = useCart();
 
   useEffect(() => {
-    api.getProduct(id).then(r => { setProduct(r.data); setActiveImg(0); setColor(0); });
-    api.getProducts({ categoryId: 5, pageSize: 8 }).then(r => setAccessories(r.data.items));
+    api.getProduct(id).then(r => { setProduct(r.data || null); setActiveImg(0); setColor(0); }).catch(() => setProduct(null));
+    api.getProducts({ categoryId: 5, pageSize: 8 }).then(r => setAccessories(Array.isArray(r.data?.items) ? r.data.items : [])).catch(() => setAccessories([]));
   }, [id]);
 
   if (!product) return <div className="loading-page"><div className="spinner" /></div>;

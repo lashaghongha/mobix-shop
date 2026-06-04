@@ -8,7 +8,7 @@ export default function OrderConfirmation() {
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    api.getOrder(id).then(r => setOrder(r.data));
+    api.getOrder(id).then(r => setOrder(r.data || null)).catch(() => setOrder(null));
   }, [id]);
 
   if (!order) return <div className="loading-page"><div className="spinner" /></div>;

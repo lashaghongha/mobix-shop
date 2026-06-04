@@ -99,8 +99,9 @@ export default function Compare() {
 
   useEffect(() => {
     if (!ids.length) { setLoading(false); return; }
-    Promise.all(ids.map(id => api.getProduct(id).then(r => r.data)))
-      .then(setProducts)
+    Promise.all(ids.map(id => api.getProduct(id).then(r => r.data).catch(() => null)))
+      .then(results => setProducts(results.filter(Boolean)))
+      .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, [searchParams.get('ids')]);
 

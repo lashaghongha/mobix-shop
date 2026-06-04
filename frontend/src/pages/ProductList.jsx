@@ -112,7 +112,8 @@ export default function ProductList() {
       ...(selectedBrands.length > 0 && { brands: selectedBrands.join(',') }),
     };
     api.getProducts(query)
-      .then(r => { setProducts(r.data.items); setTotal(r.data.total); })
+      .then(r => { setProducts(Array.isArray(r.data?.items) ? r.data.items : []); setTotal(r.data?.total || 0); })
+      .catch(() => { setProducts([]); setTotal(0); })
       .finally(() => setLoading(false));
   }, [categoryId, search, sort, minPrice, maxPrice, selectedBrands, page]);
 
