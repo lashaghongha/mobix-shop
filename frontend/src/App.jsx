@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { CompareProvider } from './context/CompareContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { ProfileProvider } from './context/ProfileContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
@@ -54,6 +55,7 @@ function ShopRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ProfileProvider>
       <CartProvider>
         <WishlistProvider>
         <CompareProvider>
@@ -77,6 +79,7 @@ export default function App() {
         </CompareProvider>
         </WishlistProvider>
       </CartProvider>
+      </ProfileProvider>
     </BrowserRouter>
   );
 }

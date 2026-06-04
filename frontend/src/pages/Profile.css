@@ -201,3 +201,63 @@
   transition: background .2s;
 }
 .profile-see-all:hover { background: #fee2e2; }
+
+/* Edit button in hero */
+.profile-edit-btn {
+  background: rgba(255,255,255,.2);
+  border: none; border-radius: 8px;
+  color: #fff; padding: 8px 10px;
+  cursor: pointer; display: flex; align-items: center;
+  transition: background .2s;
+}
+.profile-edit-btn:hover { background: rgba(255,255,255,.35); }
+
+/* Info view (logged-in, not editing) */
+.profile-info-view { display: flex; flex-direction: column; gap: 0; }
+.profile-info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 14px;
+}
+.profile-info-row span { color: #888; }
+.profile-info-row strong { color: #111; }
+.profile-info-actions { display: flex; gap: 10px; margin-top: 14px; }
+
+/* Registration / edit form */
+.profile-reg-form .form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;
+}
+.profile-reg-form .form-group { display: flex; flex-direction: column; gap: 5px; }
+.profile-reg-form label { font-size: 12px; color: #555; font-weight: 500; }
+.profile-reg-form input {
+  padding: 10px 12px; border: 1.5px solid #e5e5e5; border-radius: 10px;
+  font-size: 14px; outline: none; transition: border-color .2s;
+}
+.profile-reg-form input:focus { border-color: #c0152a; }
+
+.profile-form-error { color: #c0152a; font-size: 13px; margin: 4px 0 8px; }
+
+.profile-form-actions { display: flex; gap: 10px; margin-top: 4px; }
+
+/* Shared action buttons */
+.profile-btn-save, .profile-btn-edit {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 18px; border-radius: 10px; border: none;
+  background: #c0152a; color: #fff;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background .2s;
+}
+.profile-btn-save:hover, .profile-btn-edit:hover { background: #a01122; }
+.profile-btn-cancel, .profile-btn-logout {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 18px; border-radius: 10px;
+  border: 1.5px solid #e5e5e5; background: #fff;
+  color: #555; font-size: 14px; cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.profile-btn-cancel:hover, .profile-btn-logout:hover { border-color: #c0152a; color: #c0152a; }
+
+@media (max-width: 480px) {
+  .profile-reg-form .form-row { grid-template-columns: 1fr; }
+}

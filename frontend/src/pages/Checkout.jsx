@@ -2,14 +2,19 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { useProfile } from '../context/ProfileContext';
 import './Checkout.css';
 
 export default function Checkout() {
   const { cartItems, total, sessionId, fetchCart } = useCart();
+  const { profile, save: saveProfile } = useProfile();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    firstName: '', lastName: '', email: '', phone: '',
+    firstName:     profile?.firstName || '',
+    lastName:      profile?.lastName  || '',
+    email:         profile?.email     || '',
+    phone:         profile?.phone     || '',
     address: '', city: 'თბილისი', paymentMethod: 'card'
   });
 
@@ -20,6 +25,8 @@ export default function Checkout() {
     setSubmitting(true);
     try {
       const res = await api.createOrder({ sessionId, ...form });
+      // Save name/email/phone to profile for next time
+      saveProfile({ firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone });
       await fetchCart();
       navigate(`/order/${res.data.id}`);
     } finally {

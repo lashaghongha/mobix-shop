@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Package, Heart, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Search, Package, Heart, ChevronRight, ShoppingBag, Pencil, Check, X } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
+import { useProfile } from '../context/ProfileContext';
 import { api } from '../services/api';
 import './Profile.css';
 
@@ -26,7 +27,43 @@ function formatDate(d) {
 
 export default function Profile() {
   const { items: wishItems, count: wishCount } = useWishlist();
-  const [email, setEmail]       = useState('');
+  const { profile, save, clear, isLoggedIn } = useProfile();
+
+  // Registration / edit form state
+  const [editing, setEditing] = useState(!isLoggedIn);
+  const [draft, setDraft] = useState({
+    firstName: profile?.firstName || '',
+    lastName:  profile?.lastName  || '',
+    email:     profile?.email     || '',
+    phone:     profile?.phone     || '',
+  });
+  const [formError, setFormError] = useState('');
+
+  const handleDraft = e => setDraft(d => ({ ...d, [e.target.name]: e.target.value }));
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    if (!draft.firstName.trim() || !draft.lastName.trim() || !draft.email.trim() || !draft.phone.trim()) {
+      setFormError('გთხოვთ შეავსოთ ყველა ველი');
+      return;
+    }
+    save(draft);
+    setEditing(false);
+    setFormError('');
+  };
+
+  const handleEdit = () => {
+    setDraft({
+      firstName: profile?.firstName || '',
+      lastName:  profile?.lastName  || '',
+      email:     profile?.email     || '',
+      phone:     profile?.phone     || '',
+    });
+    setEditing(true);
+  };
+
+  // Order lookup
+  const [lookupEmail, setLookupEmail] = useState('');
   const [orders, setOrders]     = useState(null);
   const [loading, setLoading]   = useState(false);
   const [searched, setSearched] = useState(false);
@@ -34,12 +71,13 @@ export default function Profile() {
 
   const lookup = async (e) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    const q = lookupEmail.trim() || profile?.email || '';
+    if (!q) return;
     setLoading(true);
     setOrders(null);
     setSearched(false);
     try {
-      const res = await api.adminGetUser(email.trim());
+      const res = await api.adminGetUser(q);
       setOrders(res.data.orders || []);
     } catch {
       setOrders([]);
@@ -60,10 +98,73 @@ export default function Profile() {
             <circle cx="12" cy="7" r="4"/>
           </svg>
         </div>
-        <div>
-          <div className="profile-hero-name">სტუმარი</div>
-          <div className="profile-hero-sub">MobiX-ის მომხმარებელი</div>
+        <div style={{ flex: 1 }}>
+          <div className="profile-hero-name">
+            {isLoggedIn ? `${profile.firstName} ${profile.lastName}` : 'სტუმარი'}
+          </div>
+          <div className="profile-hero-sub">
+            {isLoggedIn ? profile.email : 'MobiX-ის მომხმარებელი'}
+          </div>
         </div>
+        {isLoggedIn && !editing && (
+          <button className="profile-edit-btn" onClick={handleEdit} title="რედაქტირება">
+            <Pencil size={16} />
+          </button>
+        )}
+      </div>
+
+      {/* ── Registration / Edit form ── */}
+      <div className="profile-section">
+        <div className="profile-section-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          {isLoggedIn && !editing ? 'ჩემი მონაცემები' : 'რეგისტრაცია / რედაქტირება'}
+        </div>
+
+        {isLoggedIn && !editing ? (
+          <div className="profile-info-view">
+            <div className="profile-info-row"><span>სახელი</span><strong>{profile.firstName}</strong></div>
+            <div className="profile-info-row"><span>გვარი</span><strong>{profile.lastName}</strong></div>
+            <div className="profile-info-row"><span>ელ-ფოსტა</span><strong>{profile.email}</strong></div>
+            <div className="profile-info-row"><span>ტელეფონი</span><strong>{profile.phone}</strong></div>
+            <div className="profile-info-actions">
+              <button className="profile-btn-edit" onClick={handleEdit}><Pencil size={14}/> რედაქტირება</button>
+              <button className="profile-btn-logout" onClick={clear}><X size={14}/> გასვლა</button>
+            </div>
+          </div>
+        ) : (
+          <form className="profile-reg-form" onSubmit={handleSave}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>სახელი</label>
+                <input name="firstName" value={draft.firstName} onChange={handleDraft} placeholder="სახელი" required />
+              </div>
+              <div className="form-group">
+                <label>გვარი</label>
+                <input name="lastName" value={draft.lastName} onChange={handleDraft} placeholder="გვარი" required />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>ელ-ფოსტა</label>
+                <input name="email" type="email" value={draft.email} onChange={handleDraft} placeholder="example@gmail.com" required />
+              </div>
+              <div className="form-group">
+                <label>ტელეფონი</label>
+                <input name="phone" value={draft.phone} onChange={handleDraft} placeholder="+995 5XX XX XX XX" required />
+              </div>
+            </div>
+            {formError && <p className="profile-form-error">{formError}</p>}
+            <div className="profile-form-actions">
+              <button type="submit" className="profile-btn-save"><Check size={14}/> შენახვა</button>
+              {isLoggedIn && (
+                <button type="button" className="profile-btn-cancel" onClick={() => setEditing(false)}><X size={14}/> გაუქმება</button>
+              )}
+            </div>
+          </form>
+        )}
       </div>
 
       {/* ── Quick links ── */}
@@ -92,15 +193,18 @@ export default function Profile() {
           <div className="profile-lookup-row">
             <input
               type="email"
-              placeholder="შეიყვანე email მისამართი"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              placeholder={profile?.email || 'შეიყვანე email მისამართი'}
+              value={lookupEmail}
+              onChange={e => setLookupEmail(e.target.value)}
             />
             <button type="submit" disabled={loading}>
               {loading ? <span className="profile-spin" /> : <Search size={18} />}
             </button>
           </div>
-          <p className="profile-lookup-hint">შეკვეთის განთავსებისას გამოყენებული email</p>
+          {isLoggedIn
+            ? <p className="profile-lookup-hint">ცარიელი დატოვე პროფილის email-ის გამოსაყენებლად</p>
+            : <p className="profile-lookup-hint">შეკვეთის განთავსებისას გამოყენებული email</p>
+          }
         </form>
 
         {searched && orders !== null && (
