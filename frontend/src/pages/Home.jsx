@@ -168,10 +168,10 @@ export default function Home() {
   const leaveTimer = useRef(null);
 
   useEffect(() => {
-    api.getDeals().then(r => { setDeals(r.data); setLoadingDeals(false); });
-    api.getProducts({ categoryId: 1, pageSize: 10 }).then(r => { setPhones(r.data.items); setLoadingPhones(false); });
-    api.getProducts({ categoryId: 2, pageSize: 10 }).then(r => { setLaptops(r.data.items); setLoadingLaptops(false); });
-    api.getFeatured().then(r => { setFeatured(r.data); setLoadingFeatured(false); });
+    api.getDeals().then(r => { setDeals(Array.isArray(r.data) ? r.data : []); }).catch(() => {}).finally(() => setLoadingDeals(false));
+    api.getProducts({ categoryId: 1, pageSize: 10 }).then(r => { setPhones(Array.isArray(r.data?.items) ? r.data.items : []); }).catch(() => {}).finally(() => setLoadingPhones(false));
+    api.getProducts({ categoryId: 2, pageSize: 10 }).then(r => { setLaptops(Array.isArray(r.data?.items) ? r.data.items : []); }).catch(() => {}).finally(() => setLoadingLaptops(false));
+    api.getFeatured().then(r => { setFeatured(Array.isArray(r.data) ? r.data : []); }).catch(() => {}).finally(() => setLoadingFeatured(false));
   }, []);
 
   const handleSidebarEnter = (catId, e) => {
