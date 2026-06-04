@@ -22,8 +22,10 @@ export function CartProvider({ children }) {
   const fetchCart = async () => {
     try {
       const res = await api.getCart(sessionId);
-      setCartItems(res.data);
-    } catch {}
+      setCartItems(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setCartItems([]);
+    }
   };
 
   useEffect(() => { fetchCart(); }, []);
