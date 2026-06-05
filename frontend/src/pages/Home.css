@@ -386,7 +386,7 @@
   .banner-tag { font-size: 9px; padding: 3px 7px; }
 
   /* ── Product rows ── */
-  .product-row-section { padding: 20px 0 8px; }
+  .product-row-section { padding: 20px 4px 8px; margin: 0 4px; }
   .row-header { margin-bottom: 12px; }
   .row-header h2 { font-size: 16px; }
   .product-row > * { width: 160px; }
@@ -396,7 +396,8 @@
   .promo-strip {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    padding: 10px 0 20px;
+    padding: 10px 4px 20px;
+    margin: 0 4px;
   }
   .promo-tile {
     padding: 20px 16px;
