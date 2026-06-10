@@ -8,7 +8,7 @@
   padding: 8px 12px;
   position: sticky;
   top: 57px;
-  z-index: 900;
+  z-index: 100;
   box-shadow: 0 2px 6px rgba(0,0,0,.04);
 }
 .cat-strip::-webkit-scrollbar { display: none; }
