@@ -1,3 +1,5 @@
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MobixAPI.Controllers;
@@ -6,10 +8,6 @@ namespace MobixAPI.Controllers;
 [Route("api/admin/upload")]
 public class UploadController : ControllerBase
 {
-    private readonly IWebHostEnvironment _env;
-
-    public UploadController(IWebHostEnvironment env) => _env = env;
-
     [HttpPost]
     public async Task<IActionResult> Upload(IFormFile file)
     {
@@ -23,17 +21,29 @@ public class UploadController : ControllerBase
         if (file.Length > 10 * 1024 * 1024)
             return BadRequest("ფაილი 10MB-ზე მეტია");
 
-        var uploadsDir = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads");
-        Directory.CreateDirectory(uploadsDir);
+        var cloudName  = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME");
+        var apiKey     = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY");
+        var apiSecret  = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET");
 
-        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var fileName = $"{Guid.NewGuid()}{ext}";
-        var fullPath = Path.Combine(uploadsDir, fileName);
+        if (string.IsNullOrEmpty(cloudName) || string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiSecret))
+            return StatusCode(500, "Cloudinary კონფიგურაცია არ არის");
 
-        using (var stream = System.IO.File.Create(fullPath))
-            await file.CopyToAsync(stream);
+        var cloudinary = new Cloudinary(new Account(cloudName, apiKey, apiSecret));
+        cloudinary.Api.Secure = true;
 
-        var url = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
-        return Ok(new { url });
+        using var stream = file.OpenReadStream();
+        var uploadParams = new ImageUploadParams
+        {
+            File           = new FileDescription(file.FileName, stream),
+            Folder         = "mobix",
+            Transformation = new Transformation().Quality("auto").FetchFormat("auto"),
+        };
+
+        var result = await cloudinary.UploadAsync(uploadParams);
+
+        if (result.Error != null)
+            return StatusCode(500, result.Error.Message);
+
+        return Ok(new { url = result.SecureUrl.ToString() });
     }
 }
