@@ -1,4 +1,28 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { Component } from 'react';
+
+class ErrorBoundary extends Component {
+  state = { error: null };
+  static getDerivedStateFromError(e) { return { error: e }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 40, fontFamily: 'monospace', background: '#fff1f2', minHeight: '100vh' }}>
+          <h2 style={{ color: '#c0152a' }}>შეცდომა / Error</h2>
+          <pre style={{ marginTop: 16, color: '#333', whiteSpace: 'pre-wrap', fontSize: 13 }}>
+            {this.state.error?.message}
+            {'\n\n'}
+            {this.state.error?.stack}
+          </pre>
+          <button onClick={() => window.location.reload()} style={{ marginTop: 24, padding: '10px 20px', background: '#c0152a', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+            გვერდის განახლება
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 import { CartProvider } from './context/CartContext';
 import { CompareProvider } from './context/CompareContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -57,6 +81,7 @@ function ShopRoutes() {
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <ProfileProvider>
       <CartProvider>
@@ -85,5 +110,6 @@ export default function App() {
       </CartProvider>
       </ProfileProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }

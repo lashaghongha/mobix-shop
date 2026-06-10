@@ -155,6 +155,8 @@ export default function Home() {
   const [menuTop, setMenuTop]     = useState(0);
   const [menuLeft, setMenuLeft]   = useState(0);
   const leaveTimer = useRef(null);
+  const benefitsRevealRef = useScrollReveal();
+  const promoRevealRef    = useScrollReveal();
 
   useEffect(() => {
     api.getDeals().then(r => { setDeals(Array.isArray(r.data) ? r.data : []); }).catch(() => {}).finally(() => setLoadingDeals(false));
@@ -224,7 +226,7 @@ export default function Home() {
       </div>
 
       {/* Promo strip */}
-      <div className="container promo-strip reveal-section" ref={useScrollReveal()}>
+      <div className="container promo-strip reveal-section" ref={promoRevealRef}>
         <Link to="/products?categoryId=7" className="promo-tile gaming">
           <div><div className="promo-label">Gaming Zone</div><div className="promo-sub">PlayStation 5 • Xbox Series X</div></div>
           <span style={{ fontSize:48 }}>🎮</span>
@@ -248,7 +250,7 @@ export default function Home() {
 
       {/* Benefits */}
       {benefits.length > 0 && (
-        <div className="container benefits-bar reveal-section" ref={useScrollReveal()}>
+        <div className="container benefits-bar reveal-section" ref={benefitsRevealRef}>
           {benefits.map(b => (
             <div key={b.id} className="benefit-item">
               <span>{b.icon}</span>
