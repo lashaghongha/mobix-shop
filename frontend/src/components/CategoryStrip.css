@@ -4,12 +4,8 @@
   overflow-x: auto;
   scrollbar-width: none;
   background: #fff;
-  border-bottom: 1.5px solid #f0f0f0;
-  padding: 8px 12px;
-  position: sticky;
-  top: 57px;
-  z-index: 100;
-  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  border-top: 1px solid #f0f0f0;
+  padding: 6px 12px;
 }
 .cat-strip::-webkit-scrollbar { display: none; }
 
@@ -62,8 +58,7 @@
 @media (min-width: 769px) {
   .cat-strip {
     justify-content: center;
-    padding: 8px 20px;
-    top: 61px;
+    padding: 6px 20px;
   }
   .cat-strip-item {
     min-width: 90px;

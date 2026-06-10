@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useProfile } from '../context/ProfileContext';
 import { api } from '../services/api';
+import CategoryStrip from './CategoryStrip';
 import './Header.css';
 
 export default function Header() {
@@ -250,6 +251,7 @@ export default function Header() {
 
           </div>
         </div>
+        <CategoryStrip />
       </header>
     </>
   );
