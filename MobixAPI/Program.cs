@@ -52,6 +52,33 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
+
+    // Add Benefits table if it doesn't exist (for existing databases)
+    var isPostgres = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL"));
+    if (isPostgres)
+    {
+        db.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS ""Benefits"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Icon"" TEXT NOT NULL DEFAULT '',
+                ""Title"" TEXT NOT NULL DEFAULT '',
+                ""Sub"" TEXT NOT NULL DEFAULT '',
+                ""Order"" INTEGER NOT NULL DEFAULT 0
+            );
+        ");
+        // Seed default benefits if empty
+        var count = db.Benefits.Count();
+        if (count == 0)
+        {
+            db.Database.ExecuteSqlRaw(@"
+                INSERT INTO ""Benefits"" (""Icon"", ""Title"", ""Sub"", ""Order"") VALUES
+                ('🚚', 'უფასო მიწოდება', '500₾-ზე მეტი შეკვეთისთვის', 1),
+                ('🔄', '14 დღე დაბრუნება', 'უპრობლემოდ', 2),
+                ('🛡️', 'ოფიციალური გარანტია', '24 თვე', 3),
+                ('💳', '0% განვადება', '12 თვეზე', 4);
+            ");
+        }
+    }
 }
 
 app.UseCors();
