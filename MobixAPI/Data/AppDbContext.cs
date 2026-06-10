@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<BenefitItem> Benefits => Set<BenefitItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -153,5 +154,12 @@ public class AppDbContext : DbContext
             new Product { Id = 48, Name = "Xiaomi Robot Vacuum X20 Pro",      Price = 1299, OldPrice = 1499, Description = "Xiaomi Robot Vacuum X20 Pro 6000Pa Laser Navigation",  ImageUrl = "https://images.unsplash.com/photo-1589782182703-2aaa69037b5b?w=400",                               CategoryId = 8, Brand = "Xiaomi",    Stock = 15, Rating = 4.6, ReviewCount = 312, IsFeatured = false, IsNew = true,  HasInstallment = true,  IsPublished = true },
         };
         modelBuilder.Entity<Product>().HasData(products);
+
+        modelBuilder.Entity<BenefitItem>().HasData(
+            new BenefitItem { Id = 1, Icon = "🚚", Title = "უფასო მიწოდება",     Sub = "500₾-ზე მეტი შეკვეთისთვის", Order = 1 },
+            new BenefitItem { Id = 2, Icon = "🔄", Title = "14 დღე დაბრუნება",   Sub = "უპრობლემოდ",                  Order = 2 },
+            new BenefitItem { Id = 3, Icon = "🛡️", Title = "ოფიციალური გარანტია", Sub = "24 თვე",                      Order = 3 },
+            new BenefitItem { Id = 4, Icon = "💳", Title = "0% განვადება",         Sub = "12 თვეზე",                    Order = 4 }
+        );
     }
 }

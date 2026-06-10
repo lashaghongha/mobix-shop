@@ -93,4 +93,8 @@ public class ProductsController : ControllerBase
             .ToListAsync();
         return Ok(products);
     }
+
+    [HttpGet("benefits")]
+    public async Task<IActionResult> GetBenefits() =>
+        Ok(await _db.Benefits.OrderBy(b => b.Order).ToListAsync());
 }

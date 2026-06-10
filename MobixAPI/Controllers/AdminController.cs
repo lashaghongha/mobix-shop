@@ -267,6 +267,40 @@ public class AdminController : ControllerBase
         return Ok(cat);
     }
 
+    // ─── Benefits ──────────────────────────────────────────────────────────────
+    [HttpGet("benefits")]
+    public async Task<IActionResult> GetBenefits() =>
+        Ok(await _db.Benefits.OrderBy(b => b.Order).ToListAsync());
+
+    [HttpPost("benefits")]
+    public async Task<IActionResult> CreateBenefit([FromBody] BenefitDto dto)
+    {
+        var b = new MobixAPI.Models.BenefitItem { Icon = dto.Icon, Title = dto.Title, Sub = dto.Sub, Order = dto.Order };
+        _db.Benefits.Add(b);
+        await _db.SaveChangesAsync();
+        return Ok(b);
+    }
+
+    [HttpPut("benefits/{id}")]
+    public async Task<IActionResult> UpdateBenefit(int id, [FromBody] BenefitDto dto)
+    {
+        var b = await _db.Benefits.FindAsync(id);
+        if (b is null) return NotFound();
+        b.Icon = dto.Icon; b.Title = dto.Title; b.Sub = dto.Sub; b.Order = dto.Order;
+        await _db.SaveChangesAsync();
+        return Ok(b);
+    }
+
+    [HttpDelete("benefits/{id}")]
+    public async Task<IActionResult> DeleteBenefit(int id)
+    {
+        var b = await _db.Benefits.FindAsync(id);
+        if (b is null) return NotFound();
+        _db.Benefits.Remove(b);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
     [HttpDelete("categories/{id}")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
@@ -307,6 +341,8 @@ public record ProductUpsertDto(
     Dictionary<string, string>? Specs,
     List<ProductVariantDto>? Variants
 );
+
+public record BenefitDto(string Icon, string Title, string Sub, int Order);
 
 public record ProductVariantDto(
     string Label,

@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate, Navigate } from 'react-router-dom';
 import {
-  LayoutDashboard, ShoppingBag, Package, Tags, Users, LogOut, Menu, X
+  LayoutDashboard, ShoppingBag, Package, Tags, Users, LogOut, Menu, X, Star
 } from 'lucide-react';
 import { useState } from 'react';
 import { isAdminLoggedIn } from './AdminLogin';
@@ -12,6 +12,7 @@ const NAV = [
   { to: '/admin/products', icon: Package,         label: 'პროდუქტები' },
   { to: '/admin/categories', icon: Tags,          label: 'კატეგორიები' },
   { to: '/admin/users',      icon: Users,         label: 'მომხმარებლები' },
+  { to: '/admin/benefits',   icon: Star,          label: 'უპირატესობები' },
 ];
 
 export default function AdminLayout() {

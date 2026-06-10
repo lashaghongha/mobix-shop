@@ -287,20 +287,22 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin: 16px 0 32px;
+  margin: 16px auto 32px;
+  max-width: 960px;
 }
 .benefit-item {
   display: flex;
   gap: 12px;
   align-items: center;
   background: #fff;
-  border-radius: 10px;
-  padding: 16px;
-  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px 18px;
+  border: 1.5px solid #eee;
+  justify-content: center;
 }
-.benefit-item > span { font-size: 28px; }
-.benefit-item strong { display: block; font-size: 13px; color: #111; margin-bottom: 2px; }
-.benefit-item p { font-size: 11px; color: #888; }
+.benefit-item > span { font-size: 26px; flex-shrink: 0; }
+.benefit-item strong { display: block; font-size: 13px; color: #111; margin-bottom: 2px; font-weight: 700; }
+.benefit-item p { font-size: 11px; color: #888; margin: 0; }
 
 /* ── Mobile category strip (only on mobile) ── */
 .m-cat-strip {

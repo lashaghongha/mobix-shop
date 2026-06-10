@@ -144,6 +144,7 @@ export default function Home() {
   const [deals, setDeals]       = useState([]);
   const [phones, setPhones]     = useState([]);
   const [laptops, setLaptops]   = useState([]);
+  const [benefits, setBenefits] = useState([]);
   const [loadingDeals, setLoadingDeals]     = useState(true);
   const [loadingPhones, setLoadingPhones]   = useState(true);
   const [loadingLaptops, setLoadingLaptops] = useState(true);
@@ -157,6 +158,7 @@ export default function Home() {
 
   useEffect(() => {
     api.getDeals().then(r => { setDeals(Array.isArray(r.data) ? r.data : []); }).catch(() => {}).finally(() => setLoadingDeals(false));
+    api.get('/products/benefits').then(r => setBenefits(Array.isArray(r.data) ? r.data : [])).catch(() => {});
     api.getProducts({ categoryId: 1, pageSize: 10 }).then(r => { setPhones(Array.isArray(r.data?.items) ? r.data.items : []); }).catch(() => {}).finally(() => setLoadingPhones(false));
     api.getProducts({ categoryId: 2, pageSize: 10 }).then(r => { setLaptops(Array.isArray(r.data?.items) ? r.data.items : []); }).catch(() => {}).finally(() => setLoadingLaptops(false));
     api.getFeatured().then(r => { setFeatured(Array.isArray(r.data) ? r.data : []); }).catch(() => {}).finally(() => setLoadingFeatured(false));
@@ -245,19 +247,16 @@ export default function Home() {
       </div>
 
       {/* Benefits */}
-      <div className="container benefits-bar reveal-section" ref={useScrollReveal()}>
-        {[
-          { icon:'🚚', title:'უფასო მიწოდება', sub:'500₾-ზე მეტი შეკვეთისთვის' },
-          { icon:'🔄', title:'14 დღე დაბრუნება', sub:'უპრობლემოდ' },
-          { icon:'🛡️', title:'ოფიციალური გარანტია', sub:'24 თვე' },
-          { icon:'💳', title:'0% განვადება', sub:'12 თვეზე' },
-        ].map(b => (
-          <div key={b.title} className="benefit-item">
-            <span>{b.icon}</span>
-            <div><strong>{b.title}</strong><p>{b.sub}</p></div>
-          </div>
-        ))}
-      </div>
+      {benefits.length > 0 && (
+        <div className="container benefits-bar reveal-section" ref={useScrollReveal()}>
+          {benefits.map(b => (
+            <div key={b.id} className="benefit-item">
+              <span>{b.icon}</span>
+              <div><strong>{b.title}</strong><p>{b.sub}</p></div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <BackToTop />
     </div>

@@ -36,6 +36,12 @@ export const api = {
   adminGetUsers: (params) => axios.get(`${BASE}/admin/users`, { params }),
   adminGetUser:  (email) => axios.get(`${BASE}/admin/users/${encodeURIComponent(email)}`),
 
+  // Benefits
+  get:    (path) => axios.get(`${BASE}${path}`),
+  post:   (path, data) => axios.post(`${BASE}${path}`, data),
+  put:    (path, data) => axios.put(`${BASE}${path}`, data),
+  delete: (path) => axios.delete(`${BASE}${path}`),
+
   // Upload
   adminUploadImage: (file) => {
     const fd = new FormData();
