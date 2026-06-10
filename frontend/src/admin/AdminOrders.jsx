@@ -60,7 +60,7 @@ export default function AdminOrders() {
               </tr>
             </thead>
             <tbody>
-              {data?.items.map(o => (
+              {(data?.items || []).map(o => (
                 <tr key={o.id}>
                   <td style={{ fontWeight: 700 }}>#{o.id}</td>
                   <td>{o.firstName} {o.lastName}</td>
@@ -80,7 +80,7 @@ export default function AdminOrders() {
                   </td>
                 </tr>
               ))}
-              {data?.items.length === 0 && (
+              {(data?.items || []).length === 0 && (
                 <tr><td colSpan={9} style={{ textAlign: 'center', color: '#aaa', padding: 40 }}>შეკვეთები არ არის</td></tr>
               )}
             </tbody>

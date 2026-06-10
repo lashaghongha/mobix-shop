@@ -105,7 +105,7 @@ export default function AdminProductForm() {
   const [colorHex, setColorHex] = useState('#000000');
 
   useEffect(() => {
-    api.adminGetCategories().then(r => setCategories(r.data));
+    api.adminGetCategories().then(r => setCategories(Array.isArray(r.data) ? r.data : []));
     if (isEdit) {
       api.getProduct(id).then(r => {
         const p = r.data;

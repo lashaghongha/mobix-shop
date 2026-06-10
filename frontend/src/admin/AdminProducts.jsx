@@ -21,7 +21,7 @@ export default function AdminProducts() {
   };
 
   useEffect(() => {
-    api.adminGetCategories().then(r => setCategories(r.data));
+    api.adminGetCategories().then(r => setCategories(Array.isArray(r.data) ? r.data : []));
   }, []);
 
   useEffect(() => { setPage(1); }, [catFilter, search]);
@@ -73,7 +73,7 @@ export default function AdminProducts() {
           style={{ padding: '8px 12px', border: '1.5px solid #e5e7eb', borderRadius: 9, fontSize: 13, outline: 'none', background: '#fff' }}
         >
           <option value="">ყველა კატეგორია</option>
-          {categories.map(c => <option key={c.id} value={c.id}>{c.nameGe}</option>)}
+          {(categories || []).map(c => <option key={c.id} value={c.id}>{c.nameGe}</option>)}
         </select>
       </div>
 
@@ -94,7 +94,7 @@ export default function AdminProducts() {
               </tr>
             </thead>
             <tbody>
-              {data?.items.map(p => (
+              {(data?.items || []).map(p => (
                 <tr key={p.id}>
                   <td>
                     <img src={p.imageUrl} alt="" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 8, background: '#f9f9f9', padding: 4 }} />
@@ -147,7 +147,7 @@ export default function AdminProducts() {
                   </td>
                 </tr>
               ))}
-              {data?.items.length === 0 && (
+              {(data?.items || []).length === 0 && (
                 <tr><td colSpan={8} style={{ textAlign: 'center', color: '#aaa', padding: 40 }}>პროდუქტები არ მოიძებნა</td></tr>
               )}
             </tbody>
