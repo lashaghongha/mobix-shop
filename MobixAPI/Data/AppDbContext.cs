@@ -43,6 +43,19 @@ public class AppDbContext : DbContext
             )
             .Metadata.SetValueComparer(specsComparer);
 
+        var variantsComparer = new ValueComparer<List<ProductVariant>>(
+            (a, b) => (a == null && b == null) || (a != null && b != null && a.Count == b.Count),
+            v => v.Count,
+            v => v.ToList());
+
+        modelBuilder.Entity<Product>()
+            .Property(p => p.Variants)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<List<ProductVariant>>(v, (JsonSerializerOptions?)null) ?? new()
+            )
+            .Metadata.SetValueComparer(variantsComparer);
+
         SeedData(modelBuilder);
     }
 

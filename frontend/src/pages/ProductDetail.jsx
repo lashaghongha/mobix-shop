@@ -163,18 +163,23 @@ export default function ProductDetail() {
   const [added, setAdded]             = useState(false);
   const [activeImg, setActiveImg]     = useState(0);
   const [color, setColor]             = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   const [accessories, setAccessories] = useState([]);
   const { addToCart, loading } = useCart();
 
   useEffect(() => {
-    api.getProduct(id).then(r => { setProduct(r.data || null); setActiveImg(0); setColor(0); }).catch(() => setProduct(null));
+    api.getProduct(id).then(r => { setProduct(r.data || null); setActiveImg(0); setColor(0); setSelectedVariant(null); }).catch(() => setProduct(null));
     api.getProducts({ categoryId: 5, pageSize: 8 }).then(r => setAccessories(Array.isArray(r.data?.items) ? r.data.items : [])).catch(() => setAccessories([]));
   }, [id]);
 
   if (!product) return <div className="loading-page"><div className="spinner" /></div>;
 
-  const discount = product.oldPrice
-    ? Math.round((1 - product.price / product.oldPrice) * 100)
+  const hasVariants = product.variants && product.variants.length > 0;
+  const activePrice = selectedVariant ? selectedVariant.price : product.price;
+  const activeOldPrice = selectedVariant ? selectedVariant.oldPrice : product.oldPrice;
+
+  const discount = activeOldPrice
+    ? Math.round((1 - activePrice / activeOldPrice) * 100)
     : null;
 
   const colors = parseColors(product.specs);
@@ -224,10 +229,29 @@ export default function ProductDetail() {
           <h1 className="detail-name">{product.name}</h1>
 
           <div className="detail-price-block">
-            <span className="detail-price">{product.price.toLocaleString()} ₾</span>
-            {product.oldPrice && <span className="detail-old-price">{product.oldPrice.toLocaleString()} ₾</span>}
-            {discount && <span className="detail-save">დაზოგე {(product.oldPrice - product.price).toLocaleString()} ₾</span>}
+            <span className="detail-price">{activePrice.toLocaleString()} ₾</span>
+            {activeOldPrice && <span className="detail-old-price">{activeOldPrice.toLocaleString()} ₾</span>}
+            {discount && <span className="detail-save">დაზოგე {(activeOldPrice - activePrice).toLocaleString()} ₾</span>}
           </div>
+
+          {/* ── Storage variants ── */}
+          {hasVariants && (
+            <div className="variant-group">
+              <div className="variant-label">მეხსიერება: <strong>{selectedVariant?.label ?? 'აირჩიე'}</strong></div>
+              <div className="storage-options">
+                {product.variants.map((v, i) => (
+                  <button
+                    key={i}
+                    className={`storage-btn${selectedVariant === v ? ' active' : ''}`}
+                    onClick={() => setSelectedVariant(v)}
+                  >
+                    <span className="storage-label">{v.label}</span>
+                    <span className="storage-price">₾{v.price.toLocaleString()}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ── Colors from DB ── */}
           {colors.length > 0 && (

@@ -85,8 +85,9 @@ const EMPTY_FORM = {
   images: [], categoryId: '', brand: '', stock: '',
   isFeatured: false, isNew: false, hasInstallment: false,
   isPublished: false,
-  specFields: {}, // key → value
-  colors: [],     // [{ name, hex }]
+  specFields: {},
+  colors: [],
+  variants: [], // [{ label, price, oldPrice, stock }]
 };
 
 export default function AdminProductForm() {
@@ -103,6 +104,12 @@ export default function AdminProductForm() {
   // Color add
   const [colorName, setColorName] = useState('');
   const [colorHex, setColorHex] = useState('#000000');
+
+  // Variant add
+  const [variantLabel, setVariantLabel] = useState('');
+  const [variantPrice, setVariantPrice] = useState('');
+  const [variantOldPrice, setVariantOldPrice] = useState('');
+  const [variantStock, setVariantStock] = useState('');
 
   useEffect(() => {
     api.adminGetCategories().then(r => setCategories(Array.isArray(r.data) ? r.data : []));
@@ -130,6 +137,7 @@ export default function AdminProductForm() {
           isFeatured: p.isFeatured, isNew: p.isNew, hasInstallment: p.hasInstallment,
           isPublished: p.isPublished,
           specFields, colors,
+          variants: p.variants || [],
         });
       });
     }
@@ -167,6 +175,18 @@ export default function AdminProductForm() {
   };
   const removeColor = (i) => setForm(f => ({ ...f, colors: f.colors.filter((_, idx) => idx !== i) }));
 
+  const addVariant = () => {
+    if (!variantLabel.trim() || !variantPrice) return;
+    setForm(f => ({ ...f, variants: [...f.variants, {
+      label: variantLabel.trim(),
+      price: parseFloat(variantPrice),
+      oldPrice: variantOldPrice ? parseFloat(variantOldPrice) : null,
+      stock: parseInt(variantStock) || 0,
+    }]}));
+    setVariantLabel(''); setVariantPrice(''); setVariantOldPrice(''); setVariantStock('');
+  };
+  const removeVariant = (i) => setForm(f => ({ ...f, variants: f.variants.filter((_, idx) => idx !== i) }));
+
   const toggleGroup = (key) => setOpenGroups(g => ({ ...g, [key]: !g[key] }));
 
   const buildSpecs = () => {
@@ -198,6 +218,7 @@ export default function AdminProductForm() {
         isFeatured: form.isFeatured, isNew: form.isNew, hasInstallment: form.hasInstallment,
         isPublished: form.isPublished,
         specs: buildSpecs(),
+        variants: form.variants,
       };
       if (isEdit) await api.adminUpdateProduct(id, payload);
       else await api.adminCreateProduct(payload);
@@ -312,6 +333,50 @@ export default function AdminProductForm() {
                     <span className="apf-color-name">{c.name}</span>
                     <span className="apf-color-hex">{c.hex}</span>
                     <button type="button" onClick={() => removeColor(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', marginLeft: 'auto' }}>
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* ── Variants ── */}
+            <div className="adm-card">
+              <div className="adm-card-title">მეხსიერების ვარიანტები</div>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
+                მაგ: 128GB, 256GB, 512GB — თითოეულს საკუთარი ფასი და მარაგი
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: 8, marginBottom: 8, alignItems: 'end' }}>
+                <div className="adm-field" style={{ marginBottom: 0 }}>
+                  <label>მეხსიერება *</label>
+                  <input value={variantLabel} onChange={e => setVariantLabel(e.target.value)} placeholder="256GB" onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addVariant())} />
+                </div>
+                <div className="adm-field" style={{ marginBottom: 0 }}>
+                  <label>ფასი (₾) *</label>
+                  <input type="number" min="0" value={variantPrice} onChange={e => setVariantPrice(e.target.value)} placeholder="1999" />
+                </div>
+                <div className="adm-field" style={{ marginBottom: 0 }}>
+                  <label>ძვ. ფასი (₾)</label>
+                  <input type="number" min="0" value={variantOldPrice} onChange={e => setVariantOldPrice(e.target.value)} placeholder="2299" />
+                </div>
+                <div className="adm-field" style={{ marginBottom: 0 }}>
+                  <label>მარაგი</label>
+                  <input type="number" min="0" value={variantStock} onChange={e => setVariantStock(e.target.value)} placeholder="10" />
+                </div>
+                <button type="button" className="adm-btn adm-btn-primary" style={{ padding: '8px 12px' }} onClick={addVariant}>
+                  <Plus size={16} />
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
+                {form.variants.length === 0 && (
+                  <div style={{ color: '#aaa', fontSize: 13 }}>ვარიანტები არ არის დამატებული</div>
+                )}
+                {form.variants.map((v, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f9f9f9', borderRadius: 8, padding: '8px 12px', border: '1px solid #eee' }}>
+                    <span style={{ fontWeight: 700, fontSize: 13, minWidth: 60 }}>{v.label}</span>
+                    <span style={{ color: '#c0152a', fontWeight: 700, fontSize: 13 }}>₾{v.price}</span>
+                    {v.oldPrice && <span style={{ color: '#bbb', textDecoration: 'line-through', fontSize: 12 }}>₾{v.oldPrice}</span>}
+                    <span style={{ color: '#888', fontSize: 12, marginLeft: 4 }}>მარაგი: {v.stock}</span>
+                    <button type="button" onClick={() => removeVariant(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', marginLeft: 'auto' }}>
                       <Trash2 size={13} />
                     </button>
                   </div>

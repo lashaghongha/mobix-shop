@@ -180,6 +180,7 @@ public class AdminController : ControllerBase
             HasInstallment = dto.HasInstallment,
             IsPublished    = dto.IsPublished,
             Specs          = dto.Specs ?? new(),
+            Variants       = dto.Variants?.Select(v => new ProductVariant { Label = v.Label, Price = v.Price, OldPrice = v.OldPrice, Stock = v.Stock }).ToList() ?? [],
         };
         _db.Products.Add(product);
         await _db.SaveChangesAsync();
@@ -206,6 +207,7 @@ public class AdminController : ControllerBase
         product.HasInstallment = dto.HasInstallment;
         product.IsPublished    = dto.IsPublished;
         product.Specs          = dto.Specs ?? product.Specs;
+        product.Variants       = dto.Variants?.Select(v => new ProductVariant { Label = v.Label, Price = v.Price, OldPrice = v.OldPrice, Stock = v.Stock }).ToList() ?? product.Variants;
 
         await _db.SaveChangesAsync();
         return Ok(product);
@@ -302,5 +304,13 @@ public record ProductUpsertDto(
     bool IsNew,
     bool HasInstallment,
     bool IsPublished,
-    Dictionary<string, string>? Specs
+    Dictionary<string, string>? Specs,
+    List<ProductVariantDto>? Variants
+);
+
+public record ProductVariantDto(
+    string Label,
+    decimal Price,
+    decimal? OldPrice,
+    int Stock
 );

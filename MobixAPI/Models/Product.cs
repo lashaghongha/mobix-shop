@@ -19,6 +19,15 @@ public class Product
     public bool IsNew { get; set; }
     public bool HasInstallment { get; set; }
     public Dictionary<string, string> Specs { get; set; } = new();
+    public List<ProductVariant> Variants { get; set; } = [];
     public bool IsPublished { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class ProductVariant
+{
+    public string Label { get; set; } = string.Empty;   // e.g. "128GB", "256GB"
+    public decimal Price { get; set; }
+    public decimal? OldPrice { get; set; }
+    public int Stock { get; set; }
 }

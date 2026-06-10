@@ -268,6 +268,41 @@
 .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top-color: #c0152a; border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Storage variants ── */
+.storage-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.storage-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  transition: all .2s;
+  gap: 2px;
+}
+.storage-btn:hover { border-color: #c0152a; }
+.storage-btn.active {
+  border-color: #c0152a;
+  background: #fff1f2;
+}
+.storage-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+}
+.storage-price {
+  font-size: 11px;
+  color: #c0152a;
+  font-weight: 600;
+}
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .detail-grid { grid-template-columns: 1fr; gap: 16px; }
