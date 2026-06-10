@@ -27,6 +27,7 @@ import AdminCategories from './admin/AdminCategories';
 import AdminUsers from './admin/AdminUsers';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
+import Login from './pages/Login';
 
 function ShopRoutes() {
   return (
@@ -45,6 +46,7 @@ function ShopRoutes() {
           <Route path="/compare" element={<Compare />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </main>
       <Footer />
