@@ -19,7 +19,7 @@ export default function AdminLogin() {
     e.preventDefault();
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
       localStorage.setItem('admin_auth', 'true');
-      navigate('/admin');
+      window.location.href = '/admin';
     } else {
       setError('მომხმარებელი ან პაროლი არასწორია');
     }
