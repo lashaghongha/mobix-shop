@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
 
-const ADMIN_USER = import.meta.env.VITE_ADMIN_USER;
-const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS;
+const ADMIN_USER = import.meta.env.VITE_ADMIN_USER || 'mobixadmin';
+const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || 'MobixAdmin2024';
 
 export function isAdminLoggedIn() {
   return sessionStorage.getItem('admin_auth') === 'true';
