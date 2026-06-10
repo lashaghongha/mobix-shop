@@ -230,9 +230,12 @@
     flex: 1;
     min-width: 0;
     border-radius: 50px;
-    border-width: 1.5px;
+    border: none;
+    background: #f3f4f6;
     max-width: unset;
   }
+  .search-form:focus-within { background: #eee; }
+  .search-form input { background: transparent; }
   .search-form input { font-size: 16px; padding: 7px 10px; min-width: 0; }
   .search-btn { padding: 7px 10px; flex-shrink: 0; }
 
