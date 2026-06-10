@@ -15,7 +15,8 @@
   -webkit-font-smoothing: antialiased;
 }
 
-body { min-height: 100vh; overflow-x: hidden; }
+body { min-height: 100vh; }
+html { overflow-x: hidden; }
 
 #root {
   min-height: 100vh;

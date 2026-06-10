@@ -17,6 +17,7 @@ export default function Header() {
   const isCat = pathname === '/categories';
   const debounceRef = useRef(null);
   const wrapRef = useRef(null);
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0 });
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -39,6 +40,10 @@ export default function Header() {
     }
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
+      if (wrapRef.current) {
+        const rect = wrapRef.current.getBoundingClientRect();
+        setDropPos({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX, width: rect.width });
+      }
       try {
         const r = await api.getProducts({ search: search.trim(), pageSize: 6 });
         setResults(r.data?.items || []);
@@ -126,7 +131,7 @@ export default function Header() {
               />
 
               {showDrop && (
-                <div className="search-dropdown">
+                <div className="search-dropdown" style={{ position: 'fixed', top: dropPos.top, left: dropPos.left, width: dropPos.width, zIndex: 9999 }}>
                   {loading && (
                     <div className="search-drop-loading">ეძებს...</div>
                   )}
