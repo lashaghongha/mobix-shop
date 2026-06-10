@@ -138,18 +138,6 @@ function BackToTop() {
   );
 }
 
-function MobileCatStrip() {
-  return (
-    <div className="m-cat-strip">
-      {CATEGORIES.map(({ id, name, Icon }) => (
-        <a key={id} href={`/products?categoryId=${id}`} className="m-cat-item">
-          <span className="m-cat-icon"><Icon size={28} strokeWidth={1.5} /></span>
-          <span className="m-cat-name">{name}</span>
-        </a>
-      ))}
-    </div>
-  );
-}
 
 export default function Home() {
   const [featured, setFeatured] = useState([]);
@@ -193,7 +181,6 @@ export default function Home() {
 
   return (
     <div className="home">
-      <MobileCatStrip />
 
       {/* Hero */}
       <div className="container hero-section">

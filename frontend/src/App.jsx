@@ -4,6 +4,7 @@ import { CompareProvider } from './context/CompareContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { ProfileProvider } from './context/ProfileContext';
 import Header from './components/Header';
+import CategoryStrip from './components/CategoryStrip';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
 import CompareBar from './components/CompareBar';
@@ -31,6 +32,7 @@ function ShopRoutes() {
   return (
     <>
       <Header />
+      <CategoryStrip />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />

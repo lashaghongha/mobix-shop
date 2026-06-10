@@ -1,0 +1,75 @@
+.cat-strip {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: #fff;
+  border-bottom: 1.5px solid #f0f0f0;
+  padding: 8px 12px;
+  position: sticky;
+  top: 57px;
+  z-index: 900;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+}
+.cat-strip::-webkit-scrollbar { display: none; }
+
+.cat-strip-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 76px;
+  padding: 6px 6px;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #444;
+  flex-shrink: 0;
+  transition: border-color .2s, color .2s, background .2s;
+}
+.cat-strip-item:hover {
+  background: #fff5f5;
+  color: #c0152a;
+}
+.cat-strip-item.active {
+  border-color: #c0152a;
+  color: #c0152a;
+  background: #fff1f2;
+}
+.cat-strip-item.active .cat-strip-icon svg {
+  stroke: #c0152a;
+}
+
+.cat-strip-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cat-strip-name {
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 70px;
+  text-overflow: ellipsis;
+}
+
+/* Desktop — show full width centered */
+@media (min-width: 769px) {
+  .cat-strip {
+    justify-content: center;
+    padding: 8px 20px;
+    top: 61px;
+  }
+  .cat-strip-item {
+    min-width: 90px;
+    padding: 8px 10px;
+  }
+  .cat-strip-name {
+    font-size: 11px;
+  }
+}
