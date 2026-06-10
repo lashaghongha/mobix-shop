@@ -250,8 +250,8 @@ export default function Header() {
             </div>
 
           </div>
+          <CategoryStrip />
         </div>
-        <CategoryStrip />
       </header>
     </>
   );
