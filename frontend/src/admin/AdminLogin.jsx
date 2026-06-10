@@ -17,6 +17,10 @@ export default function AdminLogin() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    console.log('entered user:', JSON.stringify(user));
+    console.log('expected user:', JSON.stringify(ADMIN_USER));
+    console.log('entered pass:', JSON.stringify(pass));
+    console.log('expected pass:', JSON.stringify(ADMIN_PASS));
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
       sessionStorage.setItem('admin_auth', 'true');
       navigate('/admin');
