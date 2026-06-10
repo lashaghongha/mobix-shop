@@ -40,17 +40,19 @@ export default function ProductCard({ product }) {
   };
 
   return (
-    <div
+    <Link
+      to={`/product/${product.id}`}
       className="pcard"
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      style={{ textDecoration: 'none' }}
     >
       {discount && <span className="pcard-best">BEST PRICE</span>}
       {product.isNew && !discount && <span className="pcard-new">NEW</span>}
       <button
         className={`pcard-wish${wished ? ' wished' : ''}`}
-        onClick={e => { e.preventDefault(); wishToggle(product); }}
+        onClick={e => { e.preventDefault(); e.stopPropagation(); wishToggle(product); }}
         title={wished ? 'სიებიდან ამოღება' : 'სურვილების სიაში დამატება'}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2"
@@ -59,13 +61,13 @@ export default function ProductCard({ product }) {
         </svg>
       </button>
 
-      <Link to={`/product/${product.id}`} className="pcard-img">
+      <div className="pcard-img">
         <img src={product.imageUrl} alt={product.name} loading="lazy" />
-      </Link>
+      </div>
 
       <div className="pcard-body">
         <div className="pcard-brand">{product.brand}</div>
-        <Link to={`/product/${product.id}`} className="pcard-name">{product.name}</Link>
+        <div className="pcard-name">{product.name}</div>
 
         <div className="pcard-price-row">
           <span className="pcard-price">{product.price.toLocaleString()} ₾</span>
@@ -84,7 +86,7 @@ export default function ProductCard({ product }) {
           <button
             className={`pcard-compare${inCompare ? ' active' : ''}`}
             title={inCompare ? 'შედარებიდან ამოღება' : 'შედარებაში დამატება'}
-            onClick={() => toggle(product)}
+            onClick={e => { e.preventDefault(); e.stopPropagation(); toggle(product); }}
           >
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
               <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
@@ -92,7 +94,7 @@ export default function ProductCard({ product }) {
           </button>
           <button
             className={`pcard-btn ${status}`}
-            onClick={handleAdd}
+            onClick={e => { e.preventDefault(); e.stopPropagation(); handleAdd(); }}
             disabled={product.stock === 0}
           >
             {status === 'added' ? (
@@ -117,6 +119,6 @@ export default function ProductCard({ product }) {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
