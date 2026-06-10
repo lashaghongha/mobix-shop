@@ -115,8 +115,9 @@
   max-width: 640px;
   border: 2px solid #eee;
   border-radius: 10px;
-  overflow: hidden;
+  overflow: visible;
   transition: border-color .2s;
+  position: relative;
 }
 .search-form:focus-within { border-color: #c0152a; }
 .search-form input {
@@ -136,6 +137,10 @@
   display: flex;
   align-items: center;
   transition: color .2s;
+  border-radius: 10px 0 0 10px;
+}
+.search-form input {
+  border-radius: 0 10px 10px 0;
 }
 .search-btn:hover { color: #c0152a; }
 
