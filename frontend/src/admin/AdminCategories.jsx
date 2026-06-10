@@ -107,8 +107,8 @@ export default function AdminCategories() {
   };
 
   // Group: top-level + children
-  const topLevel = cats.filter(c => !c.parentId);
-  const children = (parentId) => cats.filter(c => c.parentId === parentId);
+  const topLevel = (cats || []).filter(c => !c.parentId);
+  const children = (parentId) => (cats || []).filter(c => c.parentId === parentId);
 
   return (
     <div>

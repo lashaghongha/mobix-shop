@@ -102,7 +102,7 @@ export default function AdminUsers() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.items.map(u => (
+                  {(data?.items || []).map(u => (
                     <tr
                       key={u.email}
                       className={`au-row${selected === u.email ? ' au-row--active' : ''}`}
@@ -197,7 +197,7 @@ export default function AdminUsers() {
               <div className="au-orders-section">
                 <h3 className="au-orders-title">შეკვეთების ისტორია</h3>
                 <div className="au-orders-list">
-                  {detail.orders.map(order => (
+                  {(detail?.orders || []).map(order => (
                     <div
                       key={order.id}
                       className="au-order-card"
@@ -215,7 +215,7 @@ export default function AdminUsers() {
                       </div>
 
                       <div className="au-order-items">
-                        {order.items.map(item => (
+                        {(order?.items || []).map(item => (
                           <div key={item.id} className="au-order-item">
                             {item.imageUrl && (
                               <img src={item.imageUrl} alt={item.productName} className="au-item-img" />

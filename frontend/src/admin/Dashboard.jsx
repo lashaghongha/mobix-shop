@@ -70,7 +70,7 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {stats.recentOrders.map(o => (
+              {(stats.recentOrders || []).map(o => (
                 <tr key={o.id}>
                   <td><Link to={`/admin/orders/${o.id}`} style={{ color: '#c0152a', fontWeight: 700 }}>#{o.id}</Link></td>
                   <td>{o.firstName} {o.lastName}</td>
