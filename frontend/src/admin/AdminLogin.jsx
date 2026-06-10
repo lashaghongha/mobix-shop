@@ -44,7 +44,7 @@ export default function AdminLogin() {
             <input
               value={user}
               onChange={e => setUser(e.target.value)}
-              placeholder="admin"
+              placeholder="mobixadmin"
               autoFocus
             />
           </div>
