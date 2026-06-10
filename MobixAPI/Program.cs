@@ -57,6 +57,7 @@ using (var scope = app.Services.CreateScope())
     var isPostgres = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL"));
     if (isPostgres)
     {
+        db.Database.ExecuteSqlRaw(@"ALTER TABLE ""Products"" ADD COLUMN IF NOT EXISTS ""SearchAlias"" TEXT NOT NULL DEFAULT ''");
         db.Database.ExecuteSqlRaw(@"
             CREATE TABLE IF NOT EXISTS ""Benefits"" (
                 ""Id"" SERIAL PRIMARY KEY,

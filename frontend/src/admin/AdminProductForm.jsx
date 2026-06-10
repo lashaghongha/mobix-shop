@@ -85,9 +85,10 @@ const EMPTY_FORM = {
   images: [], categoryId: '', brand: '', stock: '',
   isFeatured: false, isNew: false, hasInstallment: false,
   isPublished: false,
+  searchAlias: '',
   specFields: {},
   colors: [],
-  variants: [], // [{ label, price, oldPrice, stock }]
+  variants: [],
 };
 
 export default function AdminProductForm() {
@@ -136,6 +137,7 @@ export default function AdminProductForm() {
           categoryId: p.categoryId, brand: p.brand, stock: p.stock,
           isFeatured: p.isFeatured, isNew: p.isNew, hasInstallment: p.hasInstallment,
           isPublished: p.isPublished,
+          searchAlias: p.searchAlias || '',
           specFields, colors,
           variants: p.variants || [],
         });
@@ -217,6 +219,7 @@ export default function AdminProductForm() {
         stock: parseInt(form.stock) || 0,
         isFeatured: form.isFeatured, isNew: form.isNew, hasInstallment: form.hasInstallment,
         isPublished: form.isPublished,
+        searchAlias: form.searchAlias || '',
         specs: buildSpecs(),
         variants: form.variants,
       };
@@ -259,6 +262,16 @@ export default function AdminProductForm() {
               <div className="apf-fields">
                 <Field label="სახელი *">
                   <input value={form.name} onChange={e => setField('name', e.target.value)} placeholder="iPhone 15 Pro 256GB" required />
+                </Field>
+                <Field label="ქართული სერჩის საკვანძო სიტყვები">
+                  <input
+                    value={form.searchAlias}
+                    onChange={e => setField('searchAlias', e.target.value)}
+                    placeholder="აიფონი 15 პრო, Apple phone, ეფელი..."
+                  />
+                  <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
+                    მომხმარებელს არ ეჩვენება — მხოლოდ სერჩისთვის (მძიმით გამოყავი)
+                  </div>
                 </Field>
                 <Field label="ბრენდი *">
                   <input value={form.brand} onChange={e => setField('brand', e.target.value)} placeholder="Apple" required />

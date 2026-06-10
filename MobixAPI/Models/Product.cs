@@ -22,6 +22,7 @@ public class Product
     public List<ProductVariant> Variants { get; set; } = [];
     public bool IsPublished { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string SearchAlias { get; set; } = string.Empty;
 }
 
 public class ProductVariant

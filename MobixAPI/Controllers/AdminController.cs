@@ -179,6 +179,7 @@ public class AdminController : ControllerBase
             IsNew          = dto.IsNew,
             HasInstallment = dto.HasInstallment,
             IsPublished    = dto.IsPublished,
+            SearchAlias    = dto.SearchAlias ?? string.Empty,
             Specs          = dto.Specs ?? new(),
             Variants       = dto.Variants?.Select(v => new ProductVariant { Label = v.Label, Price = v.Price, OldPrice = v.OldPrice, Stock = v.Stock }).ToList() ?? [],
         };
@@ -206,6 +207,7 @@ public class AdminController : ControllerBase
         product.IsNew          = dto.IsNew;
         product.HasInstallment = dto.HasInstallment;
         product.IsPublished    = dto.IsPublished;
+        product.SearchAlias    = dto.SearchAlias ?? product.SearchAlias;
         product.Specs          = dto.Specs ?? product.Specs;
         product.Variants       = dto.Variants?.Select(v => new ProductVariant { Label = v.Label, Price = v.Price, OldPrice = v.OldPrice, Stock = v.Stock }).ToList() ?? product.Variants;
 
@@ -339,7 +341,8 @@ public record ProductUpsertDto(
     bool HasInstallment,
     bool IsPublished,
     Dictionary<string, string>? Specs,
-    List<ProductVariantDto>? Variants
+    List<ProductVariantDto>? Variants,
+    string? SearchAlias
 );
 
 public record BenefitDto(string Icon, string Title, string Sub, int Order);

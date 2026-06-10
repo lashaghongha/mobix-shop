@@ -46,7 +46,8 @@ public class ProductsController : ControllerBase
             query = query.Where(p =>
                 p.Name.ToLower().Contains(s) ||
                 p.Brand.ToLower().Contains(s) ||
-                p.Description.ToLower().Contains(s));
+                p.Description.ToLower().Contains(s) ||
+                p.SearchAlias.ToLower().Contains(s));
         }
 
         query = sort switch
