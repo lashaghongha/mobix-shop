@@ -41,7 +41,13 @@ public class ProductsController : ControllerBase
         if (maxPrice.HasValue)
             query = query.Where(p => p.Price <= maxPrice);
         if (!string.IsNullOrEmpty(search))
-            query = query.Where(p => p.Name.Contains(search) || p.Brand.Contains(search));
+        {
+            var s = search.ToLower();
+            query = query.Where(p =>
+                p.Name.ToLower().Contains(s) ||
+                p.Brand.ToLower().Contains(s) ||
+                p.Description.ToLower().Contains(s));
+        }
 
         query = sort switch
         {
