@@ -4,6 +4,17 @@
   background: #f3f4f6;
   animation: catPageIn .55s cubic-bezier(.16,1,.3,1);
 }
+
+@media (max-width: 768px) {
+  .cat-page {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    min-height: unset;
+    height: 100%;
+    overflow: hidden;
+  }
+}
 @keyframes catPageIn {
   from { opacity: 0; transform: translateX(-24px); }
   to   { opacity: 1; transform: translateX(0); }
