@@ -4,14 +4,25 @@ using MobixAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// SQLite path: use /data/mobix.db on Railway (persistent volume), fallback to local
-var dbPath = Environment.GetEnvironmentVariable("DB_PATH") ?? "mobix.db";
-
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
+
+var pgUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlite($"Data Source={dbPath}")
-       .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
+{
+    if (!string.IsNullOrEmpty(pgUrl))
+    {
+        // Railway PostgreSQL
+        opt.UseNpgsql(pgUrl);
+    }
+    else
+    {
+        // Local development SQLite
+        var dbPath = Environment.GetEnvironmentVariable("DB_PATH") ?? "mobix.db";
+        opt.UseSqlite($"Data Source={dbPath}")
+           .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+    }
+});
 builder.Services.AddSingleton<EmailService>();
 
 // CORS — allow localhost (dev) + Vercel (prod) + any custom domain
@@ -37,7 +48,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    db.Database.EnsureCreated();
 }
 
 app.UseCors();
