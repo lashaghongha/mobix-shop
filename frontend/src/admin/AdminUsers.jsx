@@ -40,7 +40,7 @@ export default function AdminUsers() {
   useEffect(() => {
     setLoading(true);
     api.adminGetUsers({ search: search || undefined, page, pageSize: PAGE_SIZE })
-      .then(r => setData(r.data))
+      .then(r => setData(r.data && Array.isArray(r.data.items) ? r.data : { items: [], total: 0 }))
       .catch(() => setData({ items: [], total: 0 }))
       .finally(() => setLoading(false));
   }, [search, page]);
@@ -81,7 +81,7 @@ export default function AdminUsers() {
         {/* Table */}
         {loading ? (
           <div className="au-spinner">იტვირთება…</div>
-        ) : data.items.length === 0 ? (
+        ) : (data.items || []).length === 0 ? (
           <div className="au-empty">
             <Users size={40} strokeWidth={1.2} />
             <p>მომხმარებლები არ მოიძებნა</p>
@@ -122,7 +122,7 @@ export default function AdminUsers() {
                       <td className="au-td-num">
                         <span className="au-badge-orders">{u.orderCount}</span>
                       </td>
-                      <td className="au-td-num au-total">₾{u.totalSpent.toFixed(2)}</td>
+                      <td className="au-td-num au-total">₾{(u.totalSpent || 0).toFixed(2)}</td>
                       <td className="au-td-num au-date">{formatDate(u.lastOrderAt)}</td>
                       <td><ChevronRight size={15} className="au-chevron" /></td>
                     </tr>
@@ -180,7 +180,7 @@ export default function AdminUsers() {
                 <div className="au-stat">
                   <TrendingUp size={18} className="au-stat-icon" />
                   <div>
-                    <div className="au-stat-val">₾{detail.totalSpent.toFixed(2)}</div>
+                    <div className="au-stat-val">₾{(detail.totalSpent || 0).toFixed(2)}</div>
                     <div className="au-stat-lbl">სულ დახარჯული</div>
                   </div>
                 </div>
@@ -223,7 +223,7 @@ export default function AdminUsers() {
                             <div className="au-item-info">
                               <div className="au-item-name">{item.productName}</div>
                               <div className="au-item-meta">
-                                {item.quantity} × ₾{item.price.toFixed(2)}
+                                {item.quantity} × ₾{(item.price || 0).toFixed(2)}
                               </div>
                             </div>
                           </div>
@@ -232,7 +232,7 @@ export default function AdminUsers() {
 
                       <div className="au-order-footer">
                         <span>{order.paymentMethod}</span>
-                        <span className="au-order-total">₾{order.total.toFixed(2)}</span>
+                        <span className="au-order-total">₾{(order.total || 0).toFixed(2)}</span>
                       </div>
                     </div>
                   ))}
