@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useProfile } from '../context/ProfileContext';
 import { api } from '../services/api';
 import './Header.css';
 
@@ -13,6 +14,7 @@ export default function Header() {
   const [expanded, setExpanded]       = useState(false);
   const { count } = useCart();
   const { count: wishCount } = useWishlist();
+  const { profile, isLoggedIn, clear } = useProfile();
   const navigate   = useNavigate();
   const { pathname } = useLocation();
   const isCat      = pathname === '/categories';
@@ -221,13 +223,29 @@ export default function Header() {
               <Link to="/products" className="hdr-btn orange">
                 <span style={{ fontWeight: 800, fontSize: 16 }}>%</span>
               </Link>
-              <Link to="/login" className="hdr-btn">
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-                <span>შესვლა</span>
-              </Link>
+              {isLoggedIn ? (
+                <>
+                  <Link to="/profile" className="hdr-btn">
+                    <div className="hdr-avatar">{profile.firstName?.[0]}{profile.lastName?.[0]}</div>
+                    <span>{profile.firstName}</span>
+                  </Link>
+                  <button className="hdr-btn" onClick={() => { clear(); navigate('/'); }} title="გამოსვლა">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                      <polyline points="16 17 21 12 16 7"/>
+                      <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="hdr-btn">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <span>შესვლა</span>
+                </Link>
+              )}
             </div>
 
           </div>

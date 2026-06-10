@@ -212,6 +212,18 @@
   color: #fff;
 }
 .hdr-btn.orange:hover { background: #96101f; border-color: #96101f; }
+.hdr-avatar {
+  width: 22px; height: 22px;
+  background: #c0152a;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 .cart-badge {
   position: absolute;
   top: -6px;
