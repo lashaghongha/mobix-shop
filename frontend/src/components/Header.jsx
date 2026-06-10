@@ -1,23 +1,70 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { api } from '../services/api';
 import './Header.css';
 
 export default function Header() {
   const [search, setSearch] = useState('');
+  const [results, setResults] = useState([]);
+  const [showDrop, setShowDrop] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { count } = useCart();
   const { count: wishCount } = useWishlist();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isCat = pathname === '/categories';
+  const debounceRef = useRef(null);
+  const wrapRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        setShowDrop(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Debounced search
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (search.trim().length < 2) {
+      setResults([]);
+      setShowDrop(false);
+      return;
+    }
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const r = await api.getProducts({ search: search.trim(), pageSize: 6 });
+        setResults(r.data?.items || []);
+        setShowDrop(true);
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [search]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (search.trim()) {
       navigate(`/products?search=${encodeURIComponent(search)}`);
       setSearch('');
+      setShowDrop(false);
     }
+  };
+
+  const handleSelect = (product) => {
+    navigate(`/products/${product.id}`);
+    setSearch('');
+    setShowDrop(false);
   };
 
   return (
@@ -63,7 +110,7 @@ export default function Header() {
               <div className="logo-text">Mobi<span className="logo-x">x</span></div>
             </Link>
 
-            <form className="search-form" onSubmit={handleSearch}>
+            <form className="search-form" onSubmit={handleSearch} ref={wrapRef} style={{ position: 'relative' }}>
               <button type="submit" className="search-btn">
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -74,7 +121,48 @@ export default function Header() {
                 placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => results.length > 0 && setShowDrop(true)}
+                autoComplete="off"
               />
+
+              {showDrop && (
+                <div className="search-dropdown">
+                  {loading && (
+                    <div className="search-drop-loading">ეძებს...</div>
+                  )}
+                  {!loading && results.length === 0 && (
+                    <div className="search-drop-empty">პროდუქტი ვერ მოიძებნა</div>
+                  )}
+                  {!loading && results.map(p => (
+                    <div
+                      key={p.id}
+                      className="search-drop-item"
+                      onMouseDown={() => handleSelect(p)}
+                    >
+                      <img
+                        src={p.imageUrl || p.images?.[0] || '/placeholder.png'}
+                        alt={p.name}
+                        className="search-drop-img"
+                        onError={e => { e.target.src = '/placeholder.png'; }}
+                      />
+                      <div className="search-drop-info">
+                        <div className="search-drop-name">{p.name}</div>
+                        <div className="search-drop-brand">{p.brand}</div>
+                      </div>
+                      <div className="search-drop-price">₾{p.price?.toLocaleString()}</div>
+                    </div>
+                  ))}
+                  {!loading && results.length > 0 && (
+                    <button
+                      type="submit"
+                      className="search-drop-all"
+                      onMouseDown={handleSearch}
+                    >
+                      ყველა შედეგის ნახვა →
+                    </button>
+                  )}
+                </div>
+              )}
             </form>
 
             <div className="header-actions">
