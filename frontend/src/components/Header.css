@@ -215,30 +215,35 @@
 
   .header-main { padding: 8px 0; }
   .header-main-inner {
-    gap: 10px;
-    padding: 0 12px;
+    gap: 8px;
+    padding: 0 10px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .logo-text { font-size: 26px; }
+  .logo-text { font-size: 22px; flex-shrink: 0; }
   .logo-icon { width: 34px; height: 34px; }
 
   .nav-btn span { display: none; }
 
   .search-form {
     flex: 1;
+    min-width: 0;
     border-radius: 50px;
     border-width: 1.5px;
+    max-width: unset;
   }
-  .search-form input { font-size: 16px; padding: 8px 12px; }
-  .search-btn { padding: 8px 12px; }
+  .search-form input { font-size: 16px; padding: 7px 10px; min-width: 0; }
+  .search-btn { padding: 7px 10px; flex-shrink: 0; }
 
-  .header-actions { gap: 4px; }
+  .header-actions { gap: 4px; flex-shrink: 0; }
 
   .hdr-btn {
-    padding: 8px 10px;
+    padding: 7px 10px;
     border-radius: 8px;
     font-size: 12px;
     gap: 4px;
+    flex-shrink: 0;
   }
   .hdr-btn span { display: none; }
 
