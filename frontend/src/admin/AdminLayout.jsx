@@ -45,7 +45,7 @@ export default function AdminLayout() {
         <button className="adm-logout" onClick={() => navigate('/')}>
           <LogOut size={16} /> მთავარი გვერდი
         </button>
-        <button className="adm-logout" style={{ marginTop: 0, color: '#ef4444' }} onClick={() => { sessionStorage.removeItem('admin_auth'); navigate('/admin/login'); }}>
+        <button className="adm-logout" style={{ marginTop: 0, color: '#ef4444' }} onClick={() => { localStorage.removeItem('admin_auth'); navigate('/admin/login'); }}>
           <LogOut size={16} /> გასვლა
         </button>
       </aside>

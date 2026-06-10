@@ -6,7 +6,7 @@ const ADMIN_USER = import.meta.env.VITE_ADMIN_USER || 'mobixadmin';
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || 'MobixAdmin2024';
 
 export function isAdminLoggedIn() {
-  return sessionStorage.getItem('admin_auth') === 'true';
+  return localStorage.getItem('admin_auth') === 'true';
 }
 
 export default function AdminLogin() {
@@ -17,12 +17,8 @@ export default function AdminLogin() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log('entered user:', JSON.stringify(user));
-    console.log('expected user:', JSON.stringify(ADMIN_USER));
-    console.log('entered pass:', JSON.stringify(pass));
-    console.log('expected pass:', JSON.stringify(ADMIN_PASS));
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
-      sessionStorage.setItem('admin_auth', 'true');
+      localStorage.setItem('admin_auth', 'true');
       navigate('/admin');
     } else {
       setError('მომხმარებელი ან პაროლი არასწორია');
