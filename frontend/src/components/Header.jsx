@@ -6,24 +6,27 @@ import { api } from '../services/api';
 import './Header.css';
 
 export default function Header() {
-  const [search, setSearch] = useState('');
-  const [results, setResults] = useState([]);
-  const [showDrop, setShowDrop] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [search, setSearch]           = useState('');
+  const [results, setResults]         = useState([]);
+  const [showDrop, setShowDrop]       = useState(false);
+  const [loading, setLoading]         = useState(false);
+  const [expanded, setExpanded]       = useState(false);
   const { count } = useCart();
   const { count: wishCount } = useWishlist();
-  const navigate = useNavigate();
+  const navigate   = useNavigate();
   const { pathname } = useLocation();
-  const isCat = pathname === '/categories';
+  const isCat      = pathname === '/categories';
   const debounceRef = useRef(null);
-  const wrapRef = useRef(null);
+  const wrapRef     = useRef(null);
+  const inputRef    = useRef(null);
   const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0 });
 
-  // Close dropdown on outside click
+  // Close on outside click
   useEffect(() => {
     const handler = (e) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) {
         setShowDrop(false);
+        setExpanded(false);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -57,19 +60,38 @@ export default function Header() {
     return () => clearTimeout(debounceRef.current);
   }, [search]);
 
+  // Recalculate dropdown position when expanded changes
+  useEffect(() => {
+    if (expanded && wrapRef.current) {
+      setTimeout(() => {
+        const rect = wrapRef.current.getBoundingClientRect();
+        setDropPos({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX, width: rect.width });
+      }, 320);
+    }
+  }, [expanded]);
+
   const handleSearch = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (search.trim()) {
       navigate(`/products?search=${encodeURIComponent(search)}`);
-      setSearch('');
-      setShowDrop(false);
+      closeSearch();
     }
   };
 
   const handleSelect = (product) => {
-    navigate(`/products/${product.id}`);
+    navigate(`/product/${product.id}`);
+    closeSearch();
+  };
+
+  const closeSearch = () => {
     setSearch('');
     setShowDrop(false);
+    setExpanded(false);
+  };
+
+  const handleFocus = () => {
+    setExpanded(true);
+    if (results.length > 0) setShowDrop(true);
   };
 
   return (
@@ -90,10 +112,11 @@ export default function Header() {
         </div>
 
         {/* Main header */}
-        <div className="header-main">
+        <div className={`header-main${expanded ? ' search-expanded' : ''}`}>
           <div className="container header-main-inner">
+
             <button
-              className={`nav-btn${isCat ? ' active' : ''}`}
+              className={`nav-btn hdr-hide-on-expand${isCat ? ' active' : ''}`}
               onClick={() => isCat ? navigate(-1) : navigate('/categories')}
             >
               {isCat ? (
@@ -111,7 +134,7 @@ export default function Header() {
               <span>კატეგორიები</span>
             </button>
 
-            <Link to="/" className="logo">
+            <Link to="/" className="logo hdr-hide-on-expand">
               <div className="logo-text">Mobi<span className="logo-x">x</span></div>
             </Link>
 
@@ -122,28 +145,40 @@ export default function Header() {
                 </svg>
               </button>
               <input
+                ref={inputRef}
                 type="text"
-                placeholder="Search..."
+                placeholder="მოძებნე პროდუქტი..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                onFocus={() => results.length > 0 && setShowDrop(true)}
+                onFocus={handleFocus}
                 autoComplete="off"
               />
+              {expanded && (
+                <button type="button" className="search-clear-btn" onMouseDown={closeSearch}>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              )}
 
               {showDrop && (
-                <div className="search-dropdown" style={{ position: 'fixed', top: dropPos.top, left: dropPos.left, width: dropPos.width, zIndex: 9999 }}>
-                  {loading && (
-                    <div className="search-drop-loading">ეძებს...</div>
-                  )}
+                <div
+                  className="search-dropdown"
+                  style={{
+                    position: 'fixed',
+                    top: dropPos.top + 8,
+                    left: dropPos.left,
+                    width: dropPos.width,
+                    zIndex: 9999,
+                  }}
+                >
+                  {loading && <div className="search-drop-loading">ეძებს...</div>}
                   {!loading && results.length === 0 && (
                     <div className="search-drop-empty">პროდუქტი ვერ მოიძებნა</div>
                   )}
                   {!loading && results.map(p => (
-                    <div
-                      key={p.id}
-                      className="search-drop-item"
-                      onMouseDown={() => handleSelect(p)}
-                    >
+                    <div key={p.id} className="search-drop-item" onMouseDown={() => handleSelect(p)}>
                       <img
                         src={p.imageUrl || p.images?.[0] || '/placeholder.png'}
                         alt={p.name}
@@ -158,11 +193,7 @@ export default function Header() {
                     </div>
                   ))}
                   {!loading && results.length > 0 && (
-                    <button
-                      type="submit"
-                      className="search-drop-all"
-                      onMouseDown={handleSearch}
-                    >
+                    <button type="submit" className="search-drop-all" onMouseDown={handleSearch}>
                       ყველა შედეგის ნახვა →
                     </button>
                   )}
@@ -170,7 +201,7 @@ export default function Header() {
               )}
             </form>
 
-            <div className="header-actions">
+            <div className="header-actions hdr-hide-on-expand">
               <Link to="/wishlist" className="hdr-btn" style={{ position: 'relative' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -198,10 +229,10 @@ export default function Header() {
                 <span>შესვლა</span>
               </Link>
             </div>
+
           </div>
         </div>
       </header>
-
     </>
   );
 }

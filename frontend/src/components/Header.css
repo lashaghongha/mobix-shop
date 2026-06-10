@@ -112,11 +112,12 @@
 .search-form {
   flex: 1;
   display: flex;
+  align-items: center;
   max-width: 640px;
   border: 2px solid #eee;
   border-radius: 10px;
   overflow: visible;
-  transition: border-color .2s;
+  transition: border-color .2s, max-width .3s ease, flex .3s ease;
   position: relative;
 }
 .search-form:focus-within { border-color: #c0152a; }
@@ -127,6 +128,8 @@
   outline: none;
   font-size: 16px;
   background: #fff;
+  border-radius: 0 10px 10px 0;
+  min-width: 0;
 }
 .search-btn {
   padding: 10px 16px;
@@ -138,11 +141,42 @@
   align-items: center;
   transition: color .2s;
   border-radius: 10px 0 0 10px;
-}
-.search-form input {
-  border-radius: 0 10px 10px 0;
+  flex-shrink: 0;
 }
 .search-btn:hover { color: #c0152a; }
+
+/* X clear button */
+.search-clear-btn {
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color .2s;
+  border-radius: 0 10px 10px 0;
+}
+.search-clear-btn:hover { color: #c0152a; }
+
+/* Expanded state */
+.header-main.search-expanded .hdr-hide-on-expand {
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 0;
+  transition: opacity .25s ease, width .3s ease, flex .3s ease;
+}
+.header-main .hdr-hide-on-expand {
+  transition: opacity .25s ease, width .3s ease, flex .3s ease;
+}
+.header-main.search-expanded .search-form {
+  max-width: 100%;
+}
 
 /* Header actions */
 .header-actions {
@@ -251,17 +285,22 @@
   .hdr-btn span { display: none; }
 
   /* show only cart on mobile in header */
-  .hdr-btn:not([href="/cart"]) { display: none; }
+  .header-main:not(.search-expanded) .hdr-btn:not([href="/cart"]) { display: none; }
+  .header-main.search-expanded .header-actions { display: none; }
 }
 
 /* ── Search dropdown ── */
 .search-dropdown {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.18);
   border: 1px solid #eee;
   overflow: hidden;
-  margin-top: 6px;
+  animation: dropIn .18s ease;
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .search-drop-loading,
