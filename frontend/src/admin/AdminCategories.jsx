@@ -91,7 +91,8 @@ export default function AdminCategories() {
       await load();
       setModal(null);
     } catch (e) {
-      setError(e.response?.data || 'შეცდომა');
+      const msg = e.response?.data || e.response?.statusText || e.message || 'შეცდომა';
+      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally { setSaving(false); }
   };
 
