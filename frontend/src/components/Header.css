@@ -130,7 +130,7 @@
 }
 .search-btn {
   padding: 10px 16px;
-  background: #fff;
+  background: transparent;
   border: none;
   cursor: pointer;
   color: #999;
