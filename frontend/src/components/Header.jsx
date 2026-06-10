@@ -110,7 +110,7 @@ export default function Header() {
               <div className="logo-text">Mobi<span className="logo-x">x</span></div>
             </Link>
 
-            <form className="search-form" onSubmit={handleSearch} ref={wrapRef} style={{ position: 'relative' }}>
+            <form className="search-form" onSubmit={handleSearch} ref={wrapRef} style={{ position: 'relative', flex: 1, maxWidth: 560, margin: '0 auto' }}>
               <button type="submit" className="search-btn">
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
