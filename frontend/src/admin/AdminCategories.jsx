@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
 import { api } from '../services/api';
 import './Dashboard.css';
@@ -41,7 +41,7 @@ export default function AdminCategories() {
   const [deleting, setDeleting] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
 
-  const load = () => api.adminGetCategories().then(r => setCats(r.data));
+  const load = () => api.adminGetCategories().then(r => setCats(Array.isArray(r.data) ? r.data : [])).catch(() => setCats([]));
   useEffect(() => { load(); }, []);
 
   const openAdd = () => { setForm(EMPTY); setError(''); setModal('add'); };
@@ -134,9 +134,8 @@ export default function AdminCategories() {
           </thead>
           <tbody>
             {topLevel.map(cat => (
-              <>
+              <React.Fragment key={cat.id}>
                 <CatRow
-                  key={cat.id}
                   cat={cat}
                   onEdit={() => openEdit(cat)}
                   onDelete={() => handleDelete(cat.id)}
@@ -153,7 +152,7 @@ export default function AdminCategories() {
                     indent={true}
                   />
                 ))}
-              </>
+              </React.Fragment>
             ))}
             {cats.length === 0 && (
               <tr><td colSpan={7} style={{ textAlign: 'center', color: '#aaa', padding: 40 }}>კატეგორიები არ არის</td></tr>
