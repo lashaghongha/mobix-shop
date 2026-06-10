@@ -245,8 +245,7 @@ export default function ProductDetail() {
                     className={`storage-btn${selectedVariant === v ? ' active' : ''}`}
                     onClick={() => setSelectedVariant(v)}
                   >
-                    <span className="storage-label">{v.label}</span>
-                    <span className="storage-price">₾{v.price.toLocaleString()}</span>
+                    {v.label}
                   </button>
                 ))}
               </div>
