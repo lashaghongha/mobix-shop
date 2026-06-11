@@ -19,7 +19,7 @@ export default function CategoryStrip({ hidden = false }) {
   const activeCatId = Number(params.get('categoryId'));
 
   return (
-    <div className="cat-strip" style={hidden ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}>
+    <div className="cat-strip" style={hidden ? { visibility: 'hidden', pointerEvents: 'none', overflow: 'hidden', touchAction: 'none' } : undefined}>
       {CATEGORIES.map(({ id, name, Icon }) => {
         const active = activeCatId === id;
         return (
