@@ -250,7 +250,7 @@ export default function Header() {
             </div>
 
           </div>
-          <CategoryStrip />
+          <CategoryStrip hidden={isCat} />
         </div>
       </header>
     </>
