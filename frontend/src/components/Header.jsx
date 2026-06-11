@@ -137,7 +137,7 @@ export default function Header() {
               <span>კატეგორიები</span>
             </button>
 
-            <Link to="/" className="logo hdr-hide-on-expand">
+            <Link to="/" className="logo hdr-hide-on-expand" onClick={e => { if (pathname === '/') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}>
               <div className="logo-text">Mobi<span className="logo-x">x</span></div>
             </Link>
 

@@ -1,18 +1,26 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import './BottomNav.css';
 
 export default function BottomNav() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { count } = useCart();
   const { count: wishCount } = useWishlist();
 
   const active = (path) => pathname === path ? 'bnav-item active' : 'bnav-item';
 
+  const handleHome = (e) => {
+    if (pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="bottom-nav">
-      <Link to="/" className={active('/')}>
+      <Link to="/" className={active('/')} onClick={handleHome}>
         <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>
           <polyline points="9 21 9 12 15 12 15 21"/>
