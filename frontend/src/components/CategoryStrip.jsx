@@ -13,13 +13,13 @@ const CATEGORIES = [
   { id: 6, name: 'ფოტო | ვიდეო',   Icon: Camera },
 ];
 
-export default function CategoryStrip() {
+export default function CategoryStrip({ hidden = false }) {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const activeCatId = Number(params.get('categoryId'));
 
   return (
-    <div className="cat-strip">
+    <div className={`cat-strip${hidden ? ' cat-strip--hidden' : ''}`}>
       {CATEGORIES.map(({ id, name, Icon }) => {
         const active = activeCatId === id;
         return (

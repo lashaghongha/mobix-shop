@@ -6,6 +6,15 @@
   background: #fff;
   border-top: 1px solid #f0f0f0;
   padding: 6px 12px;
+  max-height: 80px;
+  transition: max-height .25s ease, padding .25s ease, border-color .25s ease;
+}
+.cat-strip--hidden {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top-color: transparent;
+  overflow: hidden;
 }
 .cat-strip::-webkit-scrollbar { display: none; }
 
