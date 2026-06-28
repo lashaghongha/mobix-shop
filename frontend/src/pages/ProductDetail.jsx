@@ -257,18 +257,15 @@ export default function ProductDetail() {
             <div className="variant-group">
               <div className="variant-label">ფერი: <strong>{colors[color]?.label}</strong></div>
               <div className="color-options">
-                {colors.map((c, i) => {
-                  const isLight = c.hex === '#ffffff' || c.hex === '#f0f0f0' || c.hex === '#fff';
-                  return (
-                    <button
-                      key={i}
-                      className={`color-btn${color === i ? ' active' : ''}`}
-                      style={{ background: c.hex, border: isLight ? '1.5px solid #ddd' : 'none' }}
-                      title={c.label}
-                      onClick={() => setColor(i)}
-                    />
-                  );
-                })}
+                {colors.map((c, i) => (
+                  <button
+                    key={i}
+                    className={`color-btn${color === i ? ' active' : ''}`}
+                    style={{ background: c.hex }}
+                    title={c.label}
+                    onClick={() => setColor(i)}
+                  />
+                ))}
               </div>
             </div>
           )}

@@ -79,6 +79,7 @@
   cursor: pointer;
   transition: transform .15s, box-shadow .15s;
   position: relative;
+  border: 1.5px solid rgba(0,0,0,0.15);
 }
 .color-btn:hover { transform: scale(1.15); }
 .color-btn.active {
