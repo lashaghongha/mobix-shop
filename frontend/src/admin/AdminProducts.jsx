@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Search, Eye, EyeOff } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Eye, EyeOff, Download } from 'lucide-react';
 import { api } from '../services/api';
 import './Dashboard.css';
 
@@ -44,13 +44,33 @@ export default function AdminProducts() {
 
   const totalPages = data ? Math.ceil(data.total / 20) : 1;
 
+  const handleExport = async () => {
+    const apiBase = import.meta.env.VITE_API_URL
+      ? `${import.meta.env.VITE_API_URL}/api`
+      : '/api';
+    const res = await fetch(`${apiBase}/admin/export/products`);
+    if (!res.ok) return alert('ექსპორტი ვერ მოხდა');
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `mobix-products-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
         <h1 className="adm-page-title" style={{ margin: 0 }}>პროდუქტები</h1>
-        <Link to="/admin/products/new" className="adm-btn adm-btn-primary">
-          <Plus size={16} /> პროდუქტის დამატება
-        </Link>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button className="adm-btn adm-btn-secondary" onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Download size={16} /> Excel-ში გამოტანა
+          </button>
+          <Link to="/admin/products/new" className="adm-btn adm-btn-primary">
+            <Plus size={16} /> პროდუქტის დამატება
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
