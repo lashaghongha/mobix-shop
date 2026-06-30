@@ -149,12 +149,14 @@ public class AdminController : ControllerBase
         [FromQuery] int? categoryId,
         [FromQuery] string? search,
         [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20)
+        [FromQuery] int pageSize = 20,
+        [FromQuery] bool? draftOnly = null)
     {
         var query = _db.Products.Include(p => p.Category).AsQueryable();
         if (categoryId.HasValue) query = query.Where(p => p.CategoryId == categoryId);
         if (!string.IsNullOrEmpty(search))
             query = query.Where(p => p.Name.Contains(search) || p.Brand.Contains(search));
+        if (draftOnly == true) query = query.Where(p => !p.IsPublished);
 
         var total = await query.CountAsync();
         var items = await query.OrderByDescending(p => p.Id).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();

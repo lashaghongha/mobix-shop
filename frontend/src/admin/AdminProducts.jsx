@@ -13,9 +13,10 @@ export default function AdminProducts() {
   const [page, setPage] = useState(1);
   const [deleting, setDeleting] = useState(null);
   const [toggling, setToggling] = useState(null);
+  const [draftOnly, setDraftOnly] = useState(false);
 
   const load = () => {
-    api.adminGetProducts({ categoryId: catFilter || undefined, search: search || undefined, page, pageSize: 20 })
+    api.adminGetProducts({ categoryId: catFilter || undefined, search: search || undefined, page, pageSize: 20, draftOnly: draftOnly || undefined })
       .then(r => setData(r.data))
       .catch(() => setData({ items: [], total: 0 }));
   };
@@ -24,8 +25,8 @@ export default function AdminProducts() {
     api.adminGetCategories().then(r => setCategories(Array.isArray(r.data) ? r.data : []));
   }, []);
 
-  useEffect(() => { setPage(1); }, [catFilter, search]);
-  useEffect(() => { load(); }, [catFilter, search, page]);
+  useEffect(() => { setPage(1); }, [catFilter, search, draftOnly]);
+  useEffect(() => { load(); }, [catFilter, search, page, draftOnly]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('დარწმუნებული ხარ?')) return;
@@ -87,6 +88,16 @@ export default function AdminProducts() {
             <Search size={16} />
           </button>
         </form>
+        <button
+          onClick={() => setDraftOnly(d => !d)}
+          style={{
+            padding: '8px 16px', border: '1.5px solid #e5e7eb', borderRadius: 9, fontSize: 13,
+            background: draftOnly ? '#f59e0b' : '#fff', color: draftOnly ? '#fff' : '#555',
+            cursor: 'pointer', fontWeight: draftOnly ? 700 : 400, transition: 'all .15s'
+          }}
+        >
+          📝 Draft{draftOnly ? ' ✓' : ''}
+        </button>
         <select
           value={catFilter}
           onChange={e => setCatFilter(e.target.value)}
