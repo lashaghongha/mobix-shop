@@ -102,7 +102,7 @@ export default function AdminProductForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [openGroups, setOpenGroups] = useState({ brand_info: true, battery: true });
-  const [autoSavePending, setAutoSavePending] = useState(false);
+  const [agentPrefilled, setAgentPrefilled] = useState(false);
 
   // Color add
   const [colorName, setColorName] = useState('');
@@ -142,7 +142,7 @@ export default function AdminProductForm() {
           label: v.label, price: v.price, oldPrice: v.oldPrice ?? '', stock: v.stock ?? 10
         })),
       });
-      setAutoSavePending(true);
+      setAgentPrefilled(true);
     }
 
     if (isEdit) {
@@ -263,44 +263,14 @@ export default function AdminProductForm() {
       else await api.adminCreateProduct(payload);
       navigate('/admin/products');
     } catch (err) {
-      setError('შეცდომა: ' + (err.response?.data || err.message));
+      const d = err.response?.data;
+      const msg = typeof d === 'string' ? d : d?.title || d?.errors ? JSON.stringify(d.errors || d) : err.message;
+      setError('შეცდომა: ' + msg);
     } finally {
       setSaving(false);
     }
   };
 
-  // Auto-save draft when AI agent pre-fills the form
-  useEffect(() => {
-    if (!autoSavePending || !form.name || !form.price || !form.categoryId || !form.brand) return;
-    setAutoSavePending(false);
-    const payload = {
-      name: form.name, description: form.description,
-      price: parseFloat(form.price),
-      oldPrice: form.oldPrice ? parseFloat(form.oldPrice) : null,
-      imageUrl: form.imageUrl, images: form.images,
-      categoryId: parseInt(form.categoryId), brand: form.brand,
-      stock: parseInt(form.stock) || 0,
-      isFeatured: form.isFeatured, isNew: form.isNew, hasInstallment: form.hasInstallment,
-      isPublished: false,
-      searchAlias: form.searchAlias || '',
-      specs: buildSpecs(),
-      variants: form.variants.map(v => ({
-        label: v.label,
-        price: parseFloat(v.price) || 0,
-        oldPrice: v.oldPrice ? parseFloat(v.oldPrice) : null,
-        stock: parseInt(v.stock) || 0,
-      })),
-    };
-    setSaving(true);
-    api.adminCreateProduct(payload)
-      .then(() => navigate('/admin/products'))
-      .catch(err => {
-        const msg = err.response?.data;
-        setError('ავტო-შენახვა ვერ მოხდა: ' + (typeof msg === 'string' ? msg : JSON.stringify(msg) || err.message));
-      })
-      .finally(() => setSaving(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoSavePending, form]);
 
   return (
     <div>
@@ -313,6 +283,11 @@ export default function AdminProductForm() {
         </h1>
       </div>
 
+      {agentPrefilled && (
+        <div style={{ background: '#dbeafe', color: '#1e40af', padding: '12px 16px', borderRadius: 10, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
+          🤖 AI-მ შეავსო ფორმა. შეამოწმე და დააჭირე "Draft-ად შენახვა" ან "გამოქვეყნება".
+        </div>
+      )}
       {error && (
         <div style={{ background: '#fee2e2', color: '#991b1b', padding: '12px 16px', borderRadius: 10, marginBottom: 16, fontSize: 13 }}>
           {error}
