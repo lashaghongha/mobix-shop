@@ -284,7 +284,10 @@ export default function AdminProductForm() {
     setSaving(true);
     api.adminCreateProduct(payload)
       .then(() => navigate('/admin/products'))
-      .catch(err => setError('ავტო-შენახვა ვერ მოხდა: ' + (err.response?.data || err.message)))
+      .catch(err => {
+        const msg = err.response?.data;
+        setError('ავტო-შენახვა ვერ მოხდა: ' + (typeof msg === 'string' ? msg : JSON.stringify(msg) || err.message));
+      })
       .finally(() => setSaving(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSavePending, form]);

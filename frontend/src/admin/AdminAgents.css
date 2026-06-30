@@ -25,8 +25,24 @@
   align-items: center;
   gap: 12px;
 }
-.agents-clear-btn {
+.agents-new-chat-btn {
   margin-left: auto;
+  background: #c0152a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background .15s;
+}
+.agents-new-chat-btn:hover { background: #a01020; }
+.agents-clear-btn {
+  margin-left: 6px;
   background: none;
   border: 1px solid #e5e7eb;
   border-radius: 8px;

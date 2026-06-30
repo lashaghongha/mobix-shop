@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Bot, User, Zap, Package, Tag, BarChart2, Search, FileText, Loader, Trash2 } from 'lucide-react';
+import { Send, Bot, User, Zap, Package, Tag, BarChart2, Search, FileText, Loader, Trash2, Plus } from 'lucide-react';
 import './AdminAgents.css';
 
 const API_BASE = import.meta.env.VITE_API_URL
@@ -114,6 +114,11 @@ export default function AdminAgents() {
             <span className="agents-status"><span className="agents-dot" />მზადაა</span>
           </div>
         </div>
+        <button className="agents-new-chat-btn" title="ახალი ჩატი" onClick={() => {
+          const initial = [{ role: 'assistant', content: 'გამარჯობა! მე ვარ MobiX AI ასისტენტი. შემიძლია:\n\n• პროდუქტების დამატება/რედაქტირება\n• ფასების შეცვლა და ფასდაკლებები\n• სტოკის მართვა\n• SEO-ს გენერაცია\n• პროდუქტების ძიება\n\nრა გინდა გააკეთო?', actions: [] }];
+          setMessages(initial);
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(initial)); } catch {}
+        }}><Plus size={14} /> ახალი ჩატი</button>
         <button className="agents-clear-btn" title="ჩატის გასუფთავება" onClick={() => {
           const initial = [{ role: 'assistant', content: 'გამარჯობა! მე ვარ MobiX AI ასისტენტი. შემიძლია:\n\n• პროდუქტების დამატება/რედაქტირება\n• ფასების შეცვლა და ფასდაკლებები\n• სტოკის მართვა\n• SEO-ს გენერაცია\n• პროდუქტების ძიება\n\nრა გინდა გააკეთო?', actions: [] }];
           setMessages(initial);
