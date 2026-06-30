@@ -155,7 +155,6 @@ export default function AdminProducts() {
                     {p.createdAt ? new Date(p.createdAt).toLocaleString('ka-GE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
                   </td>
                   <td>
-                  <td>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button
                         className={`adm-btn ${p.isPublished ? 'adm-btn-secondary' : 'adm-btn-primary'}`}
