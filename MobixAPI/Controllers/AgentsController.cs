@@ -47,22 +47,78 @@ public class AgentsController : ControllerBase
         // ── System prompt ──────────────────────────────────────────────────────
         var systemPrompt = """
             შენ ხარ MobiX ონლაინ მაღაზიის AI ასისტენტი — ქართულ ენაზე პასუხობ.
-            შეგიძლია: პროდუქტების დამატება, რედაქტირება, წაშლა, ფასების შეცვლა,
-            SEO-ს გენერაცია, აღწერების დაწერა, სტოკის განახლება.
+            შეგიძლია: პროდუქტების დამატება, ფასების შეცვლა, SEO-ს გენერაცია, სტოკის განახლება.
 
             კატეგორიები: 1=სმარტფონები, 2=ლეპტოპები, 3=ტელევიზორები,
             4=ტაბლეტები, 5=აუდიო, 6=კამერები, 7=Gaming, 8=Smart Home.
 
-            ყოველთვის გამოიყენე tool-ები მოქმედებების შესასრულებლად.
-            მოქმედების შემდეგ ქართულად ახსენი რა გააკეთე.
+            ᲛᲜᲘᲨᲕᲜᲔᲚᲝᲕᲐᲜᲘ: როდესაც ახალი პროდუქტის დამატება გინდა, ᲧᲝᲕᲔᲚᲗᲕᲘᲡ გამოიყენე
+            `prepare_product_form` tool და არა `create_product`. ეს tool მომხმარებელს აჩვენებს
+            ფორმას შემოწმებისთვის. შეავსე ყველა spec, ფერი, ვარიანტი რაც იცი.
+            create_product გამოიყენე მხოლოდ თუ მომხმარებელი პირდაპირ ითხოვს "პირდაპირ შექმნას".
+
+            ყოველთვის გამოიყენე tool-ები. მოქმედების შემდეგ ქართულად ახსენი რა გააკეთე.
             """;
 
         // ── Tool definitions ───────────────────────────────────────────────────
         var tools = new List<ChatTool>
         {
             ChatTool.CreateFunctionTool(
+                "prepare_product_form",
+                "მოამზადებს პროდუქტის ფორმის მონაცემებს — DB-ში არ წერს, მომხმარებელი ამოწმებს ფორმაში",
+                BinaryData.FromString("""
+                {
+                  "type": "object",
+                  "properties": {
+                    "name":           { "type": "string",  "description": "პროდუქტის სახელი" },
+                    "brand":          { "type": "string",  "description": "ბრენდი" },
+                    "categoryId":     { "type": "integer", "description": "კატეგორიის ID: 1=სმარტფონები,2=ლეპტოპები,3=ტელევიზორები,4=ტაბლეტები,5=აუდიო,6=კამერები,7=Gaming,8=Smart Home" },
+                    "price":          { "type": "number",  "description": "ფასი ლარში" },
+                    "oldPrice":       { "type": "number",  "description": "ძველი ფასი" },
+                    "description":    { "type": "string",  "description": "პროდუქტის სრული აღწერა ქართულად" },
+                    "stock":          { "type": "integer", "description": "მარაგი" },
+                    "searchAlias":    { "type": "string",  "description": "ქართული საძიებო ალიასები მძიმით" },
+                    "isNew":          { "type": "boolean" },
+                    "isFeatured":     { "type": "boolean" },
+                    "hasInstallment": { "type": "boolean" },
+                    "specs": {
+                      "type": "object",
+                      "description": "ტექნიკური სპეციფიკაციები. გასაღებები: brand_spec, weight, battery_capacity, charging_speed, wireless_charging, wireless_speed, nfc, release_year, screen_size, resolution, refresh_rate, brightness, screen_type, screen_protection, sim, esim, 5g, body, ip, chipset, gpu, os, os_version, stereo, bluetooth, main_camera, extra_cameras, front_camera, main_video, front_video, storage, storage_type, ram, microsd, jack35, charging_port",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    "colors": {
+                      "type": "array",
+                      "description": "ფერები — სახელი და HEX",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" },
+                          "hex":  { "type": "string" }
+                        }
+                      }
+                    },
+                    "variants": {
+                      "type": "array",
+                      "description": "მეხსიერების ვარიანტები",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label":    { "type": "string" },
+                          "price":    { "type": "number" },
+                          "oldPrice": { "type": "number" },
+                          "stock":    { "type": "integer" }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["name", "brand", "categoryId", "price", "description", "stock"]
+                }
+                """)
+            ),
+
+            ChatTool.CreateFunctionTool(
                 "create_product",
-                "ახალი პროდუქტის დამატება მაღაზიაში",
+                "ახალი პროდუქტის დამატება მაღაზიაში (პირდაპირ DB-ში, ფორმის გარეშე)",
                 BinaryData.FromString("""
                 {
                   "type": "object",
@@ -264,6 +320,54 @@ public class AgentsController : ControllerBase
 
             switch (name)
             {
+                case "prepare_product_form":
+                {
+                    var specs = new Dictionary<string, string>();
+                    if (args.TryGetProperty("specs", out var specsEl) && specsEl.ValueKind == JsonValueKind.Object)
+                        foreach (var sp in specsEl.EnumerateObject())
+                            specs[sp.Name] = sp.Value.GetString() ?? "";
+
+                    var colors = new List<object>();
+                    if (args.TryGetProperty("colors", out var colorsEl) && colorsEl.ValueKind == JsonValueKind.Array)
+                        foreach (var c in colorsEl.EnumerateArray())
+                            colors.Add(new { name = c.GetStringOrDefault("name"), hex = c.GetStringOrDefault("hex") });
+
+                    var variants = new List<object>();
+                    if (args.TryGetProperty("variants", out var varsEl) && varsEl.ValueKind == JsonValueKind.Array)
+                        foreach (var v in varsEl.EnumerateArray())
+                            variants.Add(new {
+                                label    = v.GetStringOrDefault("label"),
+                                price    = v.TryGetProperty("price",    out var vp) ? vp.GetDecimal() : 0,
+                                oldPrice = v.TryGetProperty("oldPrice", out var vop) ? vop.GetDecimal() : (decimal?)null,
+                                stock    = v.TryGetProperty("stock",    out var vs) ? vs.GetInt32() : 0
+                            });
+
+                    var formData = new {
+                        name           = args.GetStringOrDefault("name"),
+                        brand          = args.GetStringOrDefault("brand"),
+                        categoryId     = args.GetIntOrDefault("categoryId", 1),
+                        price          = args.GetDecimalOrDefault("price"),
+                        oldPrice       = args.TryGetProperty("oldPrice", out var fop) ? fop.GetDecimal() : (decimal?)null,
+                        description    = args.GetStringOrDefault("description"),
+                        stock          = args.GetIntOrDefault("stock", 10),
+                        searchAlias    = args.GetStringOrDefault("searchAlias"),
+                        isNew          = args.GetBoolOrDefault("isNew", true),
+                        isFeatured     = args.GetBoolOrDefault("isFeatured", false),
+                        hasInstallment = args.GetBoolOrDefault("hasInstallment", true),
+                        specs,
+                        colors,
+                        variants
+                    };
+
+                    return (JsonSerializer.Serialize(formData),
+                        new AgentAction {
+                            Agent    = "Product Agent",
+                            Action   = "prepare_form",
+                            Summary  = $"'{args.GetStringOrDefault("name")}' ფორმა მომზადდა",
+                            FormData = JsonSerializer.Serialize(formData)
+                        });
+                }
+
                 case "create_product":
                 {
                     var product = new Product
@@ -410,10 +514,11 @@ public class AgentChatResponse
 }
 public class AgentAction
 {
-    public string Agent    { get; set; } = "";
-    public string Action   { get; set; } = "";
-    public int?   EntityId { get; set; }
-    public string Summary  { get; set; } = "";
+    public string  Agent    { get; set; } = "";
+    public string  Action   { get; set; } = "";
+    public int?    EntityId { get; set; }
+    public string  Summary  { get; set; } = "";
+    public string? FormData { get; set; }
 }
 
 // ── JsonElement helpers ────────────────────────────────────────────────────────

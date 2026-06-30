@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Send, Bot, User, Zap, Package, Tag, BarChart2, Search, FileText, Loader } from 'lucide-react';
 import './AdminAgents.css';
 
@@ -23,6 +24,7 @@ const QUICK_PROMPTS = [
 ];
 
 export default function AdminAgents() {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -71,6 +73,13 @@ export default function AdminAgents() {
         content: data.message,
         actions: data.actions || [],
       }]);
+
+      // If agent prepared a product form, redirect to the form with pre-filled data
+      const formAction = (data.actions || []).find(a => a.action === 'prepare_form' && a.formData);
+      if (formAction) {
+        const formData = JSON.parse(formAction.formData);
+        setTimeout(() => navigate('/admin/products/new', { state: { prefill: formData } }), 800);
+      }
     } catch (e) {
       setMessages(prev => [...prev, {
         role: 'assistant',

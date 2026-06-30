@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, ChevronDown, ChevronUp, Upload, Link2 } from 'lucide-react';
 import { api } from '../services/api';
 import './Dashboard.css';
@@ -94,6 +94,7 @@ const EMPTY_FORM = {
 export default function AdminProductForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const isEdit = !!id && id !== 'new';
 
   const [form, setForm] = useState(EMPTY_FORM);
@@ -114,6 +115,34 @@ export default function AdminProductForm() {
 
   useEffect(() => {
     api.adminGetCategories().then(r => setCategories(Array.isArray(r.data) ? r.data : []));
+
+    // Pre-fill from AI agent
+    if (!isEdit && location.state?.prefill) {
+      const p = location.state.prefill;
+      const specFields = {};
+      const colors = [];
+      if (p.specs) Object.entries(p.specs).forEach(([k, v]) => { specFields[k] = v; });
+      if (p.colors) p.colors.forEach(c => colors.push({ name: c.name, hex: c.hex }));
+      setForm({
+        name: p.name || '', description: p.description || '',
+        price: p.price || '', oldPrice: p.oldPrice || '',
+        imageUrl: '', images: [],
+        categoryId: p.categoryId || '',
+        brand: p.brand || '',
+        stock: p.stock || '',
+        isFeatured: p.isFeatured || false,
+        isNew: p.isNew ?? true,
+        hasInstallment: p.hasInstallment ?? true,
+        isPublished: false,
+        searchAlias: p.searchAlias || '',
+        specFields,
+        colors,
+        variants: (p.variants || []).map(v => ({
+          label: v.label, price: v.price, oldPrice: v.oldPrice ?? '', stock: v.stock ?? 10
+        })),
+      });
+    }
+
     if (isEdit) {
       api.getProduct(id).then(r => {
         const p = r.data;
