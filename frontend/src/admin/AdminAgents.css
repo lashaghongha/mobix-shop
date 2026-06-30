@@ -25,6 +25,19 @@
   align-items: center;
   gap: 12px;
 }
+.agents-clear-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: color .15s, border-color .15s;
+}
+.agents-clear-btn:hover { color: #c0152a; border-color: #c0152a; }
 .agents-avatar {
   width: 40px; height: 40px;
   background: linear-gradient(135deg, #c0152a, #e53e3e);

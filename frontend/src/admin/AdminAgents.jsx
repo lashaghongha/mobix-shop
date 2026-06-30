@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Bot, User, Zap, Package, Tag, BarChart2, Search, FileText, Loader } from 'lucide-react';
+import { Send, Bot, User, Zap, Package, Tag, BarChart2, Search, FileText, Loader, Trash2 } from 'lucide-react';
 import './AdminAgents.css';
 
 const API_BASE = import.meta.env.VITE_API_URL
@@ -25,19 +25,24 @@ const QUICK_PROMPTS = [
 
 export default function AdminAgents() {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'გამარჯობა! მე ვარ MobiX AI ასისტენტი. შემიძლია:\n\n• პროდუქტების დამატება/რედაქტირება\n• ფასების შეცვლა და ფასდაკლებები\n• სტოკის მართვა\n• SEO-ს გენერაცია\n• პროდუქტების ძიება\n\nრა გინდა გააკეთო?',
-      actions: [],
-    }
-  ]);
+  const STORAGE_KEY = 'mobix_agent_chat';
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [{
+        role: 'assistant',
+        content: 'გამარჯობა! მე ვარ MobiX AI ასისტენტი. შემიძლია:\n\n• პროდუქტების დამატება/რედაქტირება\n• ფასების შეცვლა და ფასდაკლებები\n• სტოკის მართვა\n• SEO-ს გენერაცია\n• პროდუქტების ძიება\n\nრა გინდა გააკეთო?',
+        actions: [],
+      }];
+    } catch { return []; }
+  });
   const [input, setInput]     = useState('');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(messages)); } catch {}
   }, [messages]);
 
   const sendMessage = async (text) => {
@@ -109,6 +114,11 @@ export default function AdminAgents() {
             <span className="agents-status"><span className="agents-dot" />მზადაა</span>
           </div>
         </div>
+        <button className="agents-clear-btn" title="ჩატის გასუფთავება" onClick={() => {
+          const initial = [{ role: 'assistant', content: 'გამარჯობა! მე ვარ MobiX AI ასისტენტი. შემიძლია:\n\n• პროდუქტების დამატება/რედაქტირება\n• ფასების შეცვლა და ფასდაკლებები\n• სტოკის მართვა\n• SEO-ს გენერაცია\n• პროდუქტების ძიება\n\nრა გინდა გააკეთო?', actions: [] }];
+          setMessages(initial);
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(initial)); } catch {}
+        }}><Trash2 size={15} /></button>
         <div className="agents-chips">
           {Object.entries(AGENT_ICONS).filter(([k]) => k !== 'System').map(([name, { icon: Icon, color }]) => (
             <span key={name} className="agent-chip" style={{ borderColor: color + '33', color }}>
