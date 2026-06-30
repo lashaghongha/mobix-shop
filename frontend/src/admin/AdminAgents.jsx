@@ -79,11 +79,16 @@ export default function AdminAgents() {
         actions: data.actions || [],
       }]);
 
-      // If agent prepared a product form, redirect to the form with pre-filled data
-      const formAction = (data.actions || []).find(a => a.action === 'prepare_form' && a.formData);
+      // If agent saved a draft, redirect to edit page
+      const formAction = (data.actions || []).find(a => a.action === 'prepare_form');
       if (formAction) {
-        const formData = JSON.parse(formAction.formData);
-        setTimeout(() => navigate('/admin/products/new', { state: { prefill: formData } }), 800);
+        const id = formAction.entityId;
+        if (id) {
+          setTimeout(() => navigate(`/admin/products/${id}/edit`), 1200);
+        } else if (formAction.formData) {
+          const formData = JSON.parse(formAction.formData);
+          setTimeout(() => navigate('/admin/products/new', { state: { prefill: formData } }), 800);
+        }
       }
     } catch (e) {
       setMessages(prev => [...prev, {

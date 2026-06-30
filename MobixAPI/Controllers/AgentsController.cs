@@ -396,18 +396,52 @@ public class AgentsController : ControllerBase
                                 stock    = v.TryGetProperty("stock",    out var vs) ? vs.GetInt32() : 0
                             });
 
+                    // Build full specs including colors
+                    var fullSpecs = new Dictionary<string, string>(specs);
+                    foreach (var c in colors)
+                        fullSpecs[$"color_{c.name}"] = c.hex;
+
+                    // Save as draft immediately
+                    var draft = new Product
+                    {
+                        Name           = args.GetStringOrDefault("name"),
+                        Brand          = args.GetStringOrDefault("brand"),
+                        CategoryId     = args.GetIntOrDefault("categoryId", 1),
+                        Price          = args.GetDecimalOrDefault("price"),
+                        OldPrice       = args.TryGetProperty("oldPrice", out var fop) ? fop.GetDecimal() : null,
+                        Description    = args.GetStringOrDefault("description"),
+                        Stock          = args.GetIntOrDefault("stock", 10),
+                        SearchAlias    = args.GetStringOrDefault("searchAlias"),
+                        IsNew          = args.GetBoolOrDefault("isNew", true),
+                        IsFeatured     = args.GetBoolOrDefault("isFeatured", false),
+                        HasInstallment = args.GetBoolOrDefault("hasInstallment", true),
+                        IsPublished    = false,
+                        ImageUrl       = "",
+                        Images         = [],
+                        Specs          = fullSpecs,
+                        Variants       = variants.Select(v => new ProductVariant {
+                            Label    = v.label,
+                            Price    = (decimal)v.price,
+                            OldPrice = v.oldPrice.HasValue ? (decimal?)v.oldPrice.Value : null,
+                            Stock    = v.stock
+                        }).ToList(),
+                    };
+                    _db.Products.Add(draft);
+                    await _db.SaveChangesAsync();
+
                     var formData = new {
-                        name           = args.GetStringOrDefault("name"),
-                        brand          = args.GetStringOrDefault("brand"),
-                        categoryId     = args.GetIntOrDefault("categoryId", 1),
-                        price          = args.GetDecimalOrDefault("price"),
-                        oldPrice       = args.TryGetProperty("oldPrice", out var fop) ? fop.GetDecimal() : (decimal?)null,
-                        description    = args.GetStringOrDefault("description"),
-                        stock          = args.GetIntOrDefault("stock", 10),
-                        searchAlias    = args.GetStringOrDefault("searchAlias"),
-                        isNew          = args.GetBoolOrDefault("isNew", true),
-                        isFeatured     = args.GetBoolOrDefault("isFeatured", false),
-                        hasInstallment = args.GetBoolOrDefault("hasInstallment", true),
+                        id             = draft.Id,
+                        name           = draft.Name,
+                        brand          = draft.Brand,
+                        categoryId     = draft.CategoryId,
+                        price          = draft.Price,
+                        oldPrice       = draft.OldPrice,
+                        description    = draft.Description,
+                        stock          = draft.Stock,
+                        searchAlias    = draft.SearchAlias,
+                        isNew          = draft.IsNew,
+                        isFeatured     = draft.IsFeatured,
+                        hasInstallment = draft.HasInstallment,
                         specs,
                         colors,
                         variants
@@ -417,7 +451,8 @@ public class AgentsController : ControllerBase
                         new AgentAction {
                             Agent    = "Product Agent",
                             Action   = "prepare_form",
-                            Summary  = $"'{args.GetStringOrDefault("name")}' ფორმა მომზადდა",
+                            Summary  = $"'{draft.Name}' Draft-ად შეინახა (ID: {draft.Id})",
+                            EntityId = draft.Id,
                             FormData = JsonSerializer.Serialize(formData)
                         });
                 }
