@@ -1,6 +1,7 @@
+/* Layout */
 .agents-page {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: calc(100vh - 80px);
   background: #f8f9fb;
   border-radius: 14px;
@@ -8,12 +9,96 @@
   box-shadow: 0 2px 16px rgba(0,0,0,.06);
 }
 
+/* Sidebar */
+.agents-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #1a1a2e;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 10px;
+  gap: 8px;
+  overflow: hidden;
+}
+.agents-new-chat-btn {
+  background: #c0152a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .15s;
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.agents-new-chat-btn:hover { background: #a01020; }
+
+.agents-chat-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
+.agents-chat-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 12px;
+  transition: background .15s, color .15s;
+  position: relative;
+}
+.agents-chat-item:hover { background: #ffffff14; color: #fff; }
+.agents-chat-item.active { background: #ffffff1f; color: #fff; }
+.agents-chat-item-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agents-chat-del {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity .15s, color .15s;
+  flex-shrink: 0;
+}
+.agents-chat-item:hover .agents-chat-del { opacity: 1; }
+.agents-chat-del:hover { color: #ef4444; }
+
+/* Main area */
+.agents-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
 /* Header */
 .agents-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 14px 20px;
   background: #fff;
   border-bottom: 1px solid #eee;
   flex-shrink: 0;
@@ -25,35 +110,6 @@
   align-items: center;
   gap: 12px;
 }
-.agents-new-chat-btn {
-  margin-left: auto;
-  background: #c0152a;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: background .15s;
-}
-.agents-new-chat-btn:hover { background: #a01020; }
-.agents-clear-btn {
-  margin-left: 6px;
-  background: none;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 6px 8px;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: color .15s, border-color .15s;
-}
-.agents-clear-btn:hover { color: #c0152a; border-color: #c0152a; }
 .agents-avatar {
   width: 40px; height: 40px;
   background: linear-gradient(135deg, #c0152a, #e53e3e);
@@ -110,9 +166,7 @@
   gap: 10px;
   align-items: flex-start;
 }
-.agents-msg--user {
-  flex-direction: row-reverse;
-}
+.agents-msg--user { flex-direction: row-reverse; }
 .agents-msg-avatar {
   width: 32px; height: 32px;
   border-radius: 50%;
@@ -167,15 +221,10 @@
   border-radius: 8px;
   font-size: 12px;
 }
-.agents-action-agent {
-  font-weight: 700;
-  font-size: 11px;
-}
-.agents-action-summary {
-  color: #555;
-}
+.agents-action-agent { font-weight: 700; font-size: 11px; }
+.agents-action-summary { color: #555; }
 
-/* Typing indicator */
+/* Typing */
 .agents-typing {
   display: flex;
   gap: 4px;
@@ -223,11 +272,7 @@
   transition: all .15s;
   flex-shrink: 0;
 }
-.agents-quick-btn:hover {
-  border-color: #c0152a;
-  color: #c0152a;
-  background: #fff1f2;
-}
+.agents-quick-btn:hover { border-color: #c0152a; color: #c0152a; background: #fff1f2; }
 
 /* Input */
 .agents-input-wrap {
@@ -261,7 +306,7 @@
   border-radius: 12px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: background .15s, transform .1s;
+  transition: background .15s;
   flex-shrink: 0;
 }
 .agents-send-btn:hover:not(:disabled) { background: #a01020; }
