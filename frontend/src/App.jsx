@@ -49,6 +49,7 @@ import AdminProductForm from './admin/AdminProductForm';
 import AdminCategories from './admin/AdminCategories';
 import AdminUsers from './admin/AdminUsers';
 import AdminBenefits from './admin/AdminBenefits';
+import AdminAgents from './admin/AdminAgents';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
@@ -101,6 +102,7 @@ export default function App() {
               <Route path="categories" element={<AdminCategories />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="benefits" element={<AdminBenefits />} />
+              <Route path="agents" element={<AdminAgents />} />
             </Route>
             {/* Shop routes */}
             <Route path="/*" element={<ShopRoutes />} />
