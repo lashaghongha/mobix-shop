@@ -121,6 +121,7 @@ export default function AdminProducts() {
                 <th>მარაგი</th>
                 <th>Featured</th>
                 <th>სტატუსი</th>
+                <th>დამატების თარიღი</th>
                 <th>მოქმედება</th>
               </tr>
             </thead>
@@ -152,6 +153,10 @@ export default function AdminProducts() {
                       : <span className="adm-badge pending">Draft</span>
                     }
                   </td>
+                  <td style={{ fontSize: 11, color: '#888', whiteSpace: 'nowrap' }}>
+                    {p.createdAt ? new Date(p.createdAt).toLocaleString('ka-GE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                  </td>
+                  <td>
                   <td>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button
