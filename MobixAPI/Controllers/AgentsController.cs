@@ -23,9 +23,18 @@ public class AgentsController : ControllerBase
     }
 
     // ── POST /api/admin/agents/chat ────────────────────────────────────────────
+    [HttpGet("ping")]
+    public IActionResult Ping()
+    {
+        var key = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+        return Ok(new { ok = true, hasKey = !string.IsNullOrEmpty(key), keyHint = key?.Length > 4 ? key[..4] + "..." : "none" });
+    }
+
     [HttpPost("chat")]
     public async Task<IActionResult> Chat([FromBody] AgentChatRequest req)
     {
+        try
+        {
         var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
                   ?? _cfg["OpenAI:ApiKey"];
 
@@ -238,6 +247,11 @@ public class AgentsController : ControllerBase
             Message = "მოქმედება შესრულდა.",
             Actions = actions
         });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message, type = ex.GetType().Name, stack = ex.StackTrace?.Split('\n').Take(5) });
+        }
     }
 
     // ── Tool executor ──────────────────────────────────────────────────────────
