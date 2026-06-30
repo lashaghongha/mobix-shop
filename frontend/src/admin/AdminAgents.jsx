@@ -88,6 +88,8 @@ export default function AdminAgents() {
   };
 
   const createNewChat = () => {
+    const hasUserMsg = messages.some(m => m.role === 'user');
+    if (!hasUserMsg) return;
     const chat = newChat();
     setChats(prev => [chat, ...prev]);
     setActiveId(chat.id);
