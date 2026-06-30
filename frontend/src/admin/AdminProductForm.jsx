@@ -102,6 +102,7 @@ export default function AdminProductForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [openGroups, setOpenGroups] = useState({ brand_info: true, battery: true });
+  const [autoSavePending, setAutoSavePending] = useState(false);
 
   // Color add
   const [colorName, setColorName] = useState('');
@@ -141,6 +142,7 @@ export default function AdminProductForm() {
           label: v.label, price: v.price, oldPrice: v.oldPrice ?? '', stock: v.stock ?? 10
         })),
       });
+      setAutoSavePending(true);
     }
 
     if (isEdit) {
@@ -261,6 +263,31 @@ export default function AdminProductForm() {
       setSaving(false);
     }
   };
+
+  // Auto-save draft when AI agent pre-fills the form
+  useEffect(() => {
+    if (!autoSavePending || !form.name || !form.price || !form.categoryId || !form.brand) return;
+    setAutoSavePending(false);
+    const payload = {
+      name: form.name, description: form.description,
+      price: parseFloat(form.price),
+      oldPrice: form.oldPrice ? parseFloat(form.oldPrice) : null,
+      imageUrl: form.imageUrl, images: form.images,
+      categoryId: parseInt(form.categoryId), brand: form.brand,
+      stock: parseInt(form.stock) || 0,
+      isFeatured: form.isFeatured, isNew: form.isNew, hasInstallment: form.hasInstallment,
+      isPublished: false,
+      searchAlias: form.searchAlias || '',
+      specs: buildSpecs(),
+      variants: form.variants,
+    };
+    setSaving(true);
+    api.adminCreateProduct(payload)
+      .then(() => navigate('/admin/products'))
+      .catch(err => setError('ავტო-შენახვა ვერ მოხდა: ' + (err.response?.data || err.message)))
+      .finally(() => setSaving(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSavePending, form]);
 
   return (
     <div>
