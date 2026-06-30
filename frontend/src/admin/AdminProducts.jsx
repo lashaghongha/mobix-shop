@@ -119,7 +119,6 @@ export default function AdminProducts() {
                 <th>ბრენდი</th>
                 <th>ფასი</th>
                 <th>მარაგი</th>
-                <th>Featured</th>
                 <th>სტატუსი</th>
                 <th>დამატების თარიღი</th>
                 <th>მოქმედება</th>
@@ -146,7 +145,6 @@ export default function AdminProducts() {
                       {p.stock}
                     </span>
                   </td>
-                  <td>{p.isFeatured ? '✓' : '—'}</td>
                   <td>
                     {p.isPublished
                       ? <span className="adm-badge delivered">გამოქვეყნებული</span>
