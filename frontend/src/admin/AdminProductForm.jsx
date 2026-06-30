@@ -252,7 +252,12 @@ export default function AdminProductForm() {
         isPublished: form.isPublished,
         searchAlias: form.searchAlias || '',
         specs: buildSpecs(),
-        variants: form.variants,
+        variants: form.variants.map(v => ({
+          label: v.label,
+          price: parseFloat(v.price) || 0,
+          oldPrice: v.oldPrice ? parseFloat(v.oldPrice) : null,
+          stock: parseInt(v.stock) || 0,
+        })),
       };
       if (isEdit) await api.adminUpdateProduct(id, payload);
       else await api.adminCreateProduct(payload);
@@ -279,7 +284,12 @@ export default function AdminProductForm() {
       isPublished: false,
       searchAlias: form.searchAlias || '',
       specs: buildSpecs(),
-      variants: form.variants,
+      variants: form.variants.map(v => ({
+        label: v.label,
+        price: parseFloat(v.price) || 0,
+        oldPrice: v.oldPrice ? parseFloat(v.oldPrice) : null,
+        stock: parseInt(v.stock) || 0,
+      })),
     };
     setSaving(true);
     api.adminCreateProduct(payload)
