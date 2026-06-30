@@ -381,19 +381,19 @@ public class AgentsController : ControllerBase
                         foreach (var sp in specsEl.EnumerateObject())
                             specs[sp.Name] = sp.Value.GetString() ?? "";
 
-                    var colors = new List<object>();
+                    var colors = new List<(string name, string hex)>();
                     if (args.TryGetProperty("colors", out var colorsEl) && colorsEl.ValueKind == JsonValueKind.Array)
                         foreach (var c in colorsEl.EnumerateArray())
-                            colors.Add(new { name = c.GetStringOrDefault("name"), hex = c.GetStringOrDefault("hex") });
+                            colors.Add((c.GetStringOrDefault("name"), c.GetStringOrDefault("hex")));
 
-                    var variants = new List<object>();
+                    var variantModels = new List<ProductVariant>();
                     if (args.TryGetProperty("variants", out var varsEl) && varsEl.ValueKind == JsonValueKind.Array)
                         foreach (var v in varsEl.EnumerateArray())
-                            variants.Add(new {
-                                label    = v.GetStringOrDefault("label"),
-                                price    = v.TryGetProperty("price",    out var vp) ? vp.GetDecimal() : 0,
-                                oldPrice = v.TryGetProperty("oldPrice", out var vop) ? vop.GetDecimal() : (decimal?)null,
-                                stock    = v.TryGetProperty("stock",    out var vs) ? vs.GetInt32() : 0
+                            variantModels.Add(new ProductVariant {
+                                Label    = v.GetStringOrDefault("label"),
+                                Price    = v.TryGetProperty("price",    out var vp)  ? vp.GetDecimal()  : 0,
+                                OldPrice = v.TryGetProperty("oldPrice", out var vop) ? vop.GetDecimal() : null,
+                                Stock    = v.TryGetProperty("stock",    out var vs)  ? vs.GetInt32()    : 0
                             });
 
                     // Build full specs including colors
@@ -419,12 +419,7 @@ public class AgentsController : ControllerBase
                         ImageUrl       = "",
                         Images         = [],
                         Specs          = fullSpecs,
-                        Variants       = variants.Select(v => new ProductVariant {
-                            Label    = v.label,
-                            Price    = (decimal)v.price,
-                            OldPrice = v.oldPrice.HasValue ? (decimal?)v.oldPrice.Value : null,
-                            Stock    = v.stock
-                        }).ToList(),
+                        Variants       = variantModels,
                     };
                     _db.Products.Add(draft);
                     await _db.SaveChangesAsync();
@@ -444,7 +439,7 @@ public class AgentsController : ControllerBase
                         hasInstallment = draft.HasInstallment,
                         specs,
                         colors,
-                        variants
+                        variants = variantModels.Select(v => new { v.Label, v.Price, v.OldPrice, v.Stock })
                     };
 
                     return (JsonSerializer.Serialize(formData),
