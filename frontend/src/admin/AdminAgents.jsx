@@ -224,7 +224,6 @@ export default function AdminAgents() {
               {/* Agent header */}
               <div
                 className={`agents-agent-header${isActive ? ' active' : ''}`}
-                style={{ '--agent-color': a.color }}
                 onClick={() => { switchAgent(a.id); setExpanded(p => ({ ...p, [a.id]: !p[a.id] })); }}
               >
                 <div className="agents-agent-icon" style={{ background: a.color + '22', color: a.color }}>

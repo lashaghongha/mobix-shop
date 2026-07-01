@@ -39,15 +39,55 @@
 }
 .agents-new-chat-btn:hover { background: #a01020; }
 
+/* Agent groups in sidebar */
+.agents-agent-group { margin-bottom: 2px; }
+
+.agents-agent-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #ccc;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: background .15s, color .15s;
+  user-select: none;
+  background: transparent;
+}
+.agents-agent-header:hover { background: #ffffff12; color: #fff; }
+.agents-agent-header.active { background: #ffffff1a; color: #fff; }
+
+.agents-agent-icon {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.agents-agent-name { flex: 1; }
+
 .agents-chat-list {
-  flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  scrollbar-width: thin;
-  scrollbar-color: #333 transparent;
+  gap: 1px;
+  padding: 2px 0 4px 36px;
 }
+
+.agents-new-chat-inline {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 8px;
+  background: none;
+  border: 1px dashed #444;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #666;
+  cursor: pointer;
+  margin-top: 2px;
+  transition: all .15s;
+  width: fit-content;
+}
+.agents-new-chat-inline:hover { border-color: #888; color: #ccc; }
 .agents-chat-item {
   display: flex;
   align-items: center;
