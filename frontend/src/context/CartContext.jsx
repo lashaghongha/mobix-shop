@@ -3,7 +3,7 @@ import { api } from '../services/api';
 
 const CartContext = createContext();
 
-const SESSION_KEY = 'zoommer_session';
+const SESSION_KEY = 'mobix_session';
 
 function getSessionId() {
   let id = localStorage.getItem(SESSION_KEY);
