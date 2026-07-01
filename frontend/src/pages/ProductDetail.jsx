@@ -183,6 +183,7 @@ export default function ProductDetail() {
     : null;
 
   const colors = parseColors(product.specs);
+  const installmentMonths = product.installmentMonths > 0 ? product.installmentMonths : 12;
 
   // Gallery
   const gallery = product.images?.length > 1
@@ -275,7 +276,7 @@ export default function ProductDetail() {
               <div className="inst-icon">💳</div>
               <div>
                 <strong>0%-იანი განვადება</strong>
-                <p>12 თვე × {Math.round(product.price / 12).toLocaleString()} ₾</p>
+                <p>{installmentMonths} თვე × {Math.round(activePrice / installmentMonths).toLocaleString()} ₾</p>
               </div>
             </div>
           )}

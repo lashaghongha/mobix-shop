@@ -85,6 +85,7 @@ const EMPTY_FORM = {
   name: '', description: '', price: '', oldPrice: '', imageUrl: '',
   images: [], categoryId: '', brand: '', stock: '',
   isFeatured: false, isNew: false, hasInstallment: false,
+  installmentMonths: 12,
   isPublished: false,
   searchAlias: '',
   specFields: {},
@@ -135,6 +136,7 @@ export default function AdminProductForm() {
         isFeatured: p.isFeatured || false,
         isNew: p.isNew ?? true,
         hasInstallment: p.hasInstallment ?? true,
+        installmentMonths: p.installmentMonths || 12,
         isPublished: false,
         searchAlias: p.searchAlias || '',
         specFields,
@@ -168,6 +170,7 @@ export default function AdminProductForm() {
           imageUrl: p.imageUrl, images: p.images || [],
           categoryId: p.categoryId, brand: p.brand, stock: p.stock,
           isFeatured: p.isFeatured, isNew: p.isNew, hasInstallment: p.hasInstallment,
+          installmentMonths: p.installmentMonths || 12,
           isPublished: p.isPublished,
           searchAlias: p.searchAlias || '',
           specFields, colors,
@@ -250,6 +253,7 @@ export default function AdminProductForm() {
         categoryId: parseInt(form.categoryId), brand: form.brand,
         stock: parseInt(form.stock) || 0,
         isFeatured: form.isFeatured, isNew: form.isNew, hasInstallment: form.hasInstallment,
+        installmentMonths: parseInt(form.installmentMonths) || 12,
         isPublished: form.isPublished,
         searchAlias: form.searchAlias || '',
         specs: buildSpecs(),
@@ -399,6 +403,24 @@ export default function AdminProductForm() {
                     {lbl}
                   </label>
                 ))}
+                {form.hasInstallment && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4, paddingLeft: 26 }}>
+                    <label style={{ fontSize: 13, color: '#555' }}>განვადების თვეები:</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="60"
+                      value={form.installmentMonths}
+                      onChange={e => setField('installmentMonths', e.target.value)}
+                      style={{ width: 80, padding: '6px 10px', border: '1.5px solid #e5e7eb', borderRadius: 8 }}
+                    />
+                    {form.price > 0 && form.installmentMonths > 0 && (
+                      <span style={{ fontSize: 12, color: '#888' }}>
+                        ≈ {Math.round(parseFloat(form.price) / parseInt(form.installmentMonths)).toLocaleString()} ₾ / თვე
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

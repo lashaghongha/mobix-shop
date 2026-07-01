@@ -180,6 +180,7 @@ public class AdminController : ControllerBase
             IsFeatured     = dto.IsFeatured,
             IsNew          = dto.IsNew,
             HasInstallment = dto.HasInstallment,
+            InstallmentMonths = dto.InstallmentMonths > 0 ? dto.InstallmentMonths : 12,
             IsPublished    = dto.IsPublished,
             SearchAlias    = dto.SearchAlias ?? string.Empty,
             Specs          = dto.Specs ?? new(),
@@ -208,6 +209,7 @@ public class AdminController : ControllerBase
         product.IsFeatured     = dto.IsFeatured;
         product.IsNew          = dto.IsNew;
         product.HasInstallment = dto.HasInstallment;
+        product.InstallmentMonths = dto.InstallmentMonths > 0 ? dto.InstallmentMonths : 12;
         product.IsPublished    = dto.IsPublished;
         product.SearchAlias    = dto.SearchAlias ?? product.SearchAlias;
         product.Specs          = dto.Specs ?? product.Specs;
@@ -341,6 +343,7 @@ public record ProductUpsertDto(
     bool IsFeatured,
     bool IsNew,
     bool HasInstallment,
+    int InstallmentMonths,
     bool IsPublished,
     Dictionary<string, string>? Specs,
     List<ProductVariantDto>? Variants,

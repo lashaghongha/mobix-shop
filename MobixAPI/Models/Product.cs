@@ -18,6 +18,7 @@ public class Product
     public bool IsFeatured { get; set; }
     public bool IsNew { get; set; }
     public bool HasInstallment { get; set; }
+    public int InstallmentMonths { get; set; } = 12;
     public Dictionary<string, string> Specs { get; set; } = new();
     public List<ProductVariant> Variants { get; set; } = [];
     public bool IsPublished { get; set; } = false;
