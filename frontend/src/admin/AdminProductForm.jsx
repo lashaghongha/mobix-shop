@@ -340,20 +340,20 @@ export default function AdminProductForm() {
               <div className="adm-card-title">ძირითადი ინფო</div>
               <div className="apf-fields">
                 <Field label="სახელი *">
-                  <input value={form.name} onChange={e => setField('name', e.target.value)} placeholder="iPhone 15 Pro 256GB" required />
+                  <input value={form.name} onChange={e => setField('name', e.target.value)} placeholder="პროდუქტის სახელი" required />
                 </Field>
                 <Field label="ქართული სერჩის საკვანძო სიტყვები">
                   <input
                     value={form.searchAlias}
                     onChange={e => setField('searchAlias', e.target.value)}
-                    placeholder="აიფონი 15 პრო, Apple phone, ეფელი..."
+                    placeholder="ქართული სიტყვები მძიმით, მაგ: სამსუნგი, გალაქსი..."
                   />
                   <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
                     მომხმარებელს არ ეჩვენება — მხოლოდ სერჩისთვის (მძიმით გამოყავი)
                   </div>
                 </Field>
                 <Field label="ბრენდი *">
-                  <input value={form.brand} onChange={e => setField('brand', e.target.value)} placeholder="Apple" required />
+                  <input value={form.brand} onChange={e => setField('brand', e.target.value)} placeholder="მაგ: Samsung, Apple, Sony..." required />
                 </Field>
                 {isEdit && (
                   <Field label="კატეგორია *">
