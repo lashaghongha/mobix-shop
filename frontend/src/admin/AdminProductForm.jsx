@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, ChevronDown, ChevronUp, Upload, Link2 } from 'lucide-react';
 import { api } from '../services/api';
+import { getCategorySpecs } from './categorySpecs';
 import './Dashboard.css';
 import './AdminProductForm.css';
 
-// ── Predefined spec groups ──────────────────────────────────────────────────
+// ── Predefined spec groups (legacy fallback) ────────────────────────────────
 const SPEC_GROUPS = [
   {
     key: 'brand_info', label: 'ბრენდი / ზომა',
@@ -521,51 +522,68 @@ export default function AdminProductForm() {
               </div>
             </div>
 
-            {/* ── Spec groups (collapsible) ── */}
+            {/* ── Spec groups (category-specific) ── */}
             <div className="adm-card" style={{ padding: 0, overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px 14px', borderBottom: '1.5px solid #eee' }}>
                 <div className="adm-card-title" style={{ margin: 0 }}>ტექნიკური მახასიათებლები</div>
-                <div style={{ fontSize: 12, color: '#aaa', marginTop: 4 }}>ცარიელი ველები არ შეინახება</div>
-              </div>
-              {SPEC_GROUPS.map(({ key, label, fields }) => (
-                <div key={key} className="apf-spec-group">
-                  <button
-                    type="button"
-                    className="apf-spec-header"
-                    onClick={() => toggleGroup(key)}
-                  >
-                    <span>{label}</span>
-                    {openGroups[key] ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                  </button>
-                  {openGroups[key] && (
-                    <div className="apf-spec-body">
-                      {fields.map(({ key: fk, label: fl, placeholder, type }) => (
-                        <div key={fk} className="apf-spec-row">
-                          <label className="apf-spec-label">{fl}</label>
-                          {type === 'yesno' ? (
-                            <select
-                              value={form.specFields[fk] || ''}
-                              onChange={e => setSpec(fk, e.target.value)}
-                              className="apf-spec-select"
-                            >
-                              <option value="">—</option>
-                              <option value="Yes">Yes</option>
-                              <option value="No">No</option>
-                            </select>
-                          ) : (
-                            <input
-                              value={form.specFields[fk] || ''}
-                              onChange={e => setSpec(fk, e.target.value)}
-                              placeholder={placeholder}
-                              className="apf-spec-input"
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <div style={{ fontSize: 12, color: '#aaa', marginTop: 4 }}>
+                  {form.categoryId ? 'ცარიელი ველები არ შეინახება' : '⚠ ჯერ კატეგორია აირჩიე'}
                 </div>
-              ))}
+              </div>
+              {form.categoryId ? (
+                getCategorySpecs(form.categoryId).map(({ group, fields }) => (
+                  <div key={group} className="apf-spec-group">
+                    <button
+                      type="button"
+                      className="apf-spec-header"
+                      onClick={() => toggleGroup(group)}
+                    >
+                      <span>{group}</span>
+                      {openGroups[group] ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                    </button>
+                    {openGroups[group] !== false && (
+                      <div className="apf-spec-body">
+                        {fields.map(({ key: fk, label: fl, placeholder, type, options }) => (
+                          <div key={fk} className="apf-spec-row">
+                            <label className="apf-spec-label">{fl}</label>
+                            {type === 'yesno' ? (
+                              <select
+                                value={form.specFields[fk] || ''}
+                                onChange={e => setSpec(fk, e.target.value)}
+                                className="apf-spec-select"
+                              >
+                                <option value="">—</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                              </select>
+                            ) : type === 'select' ? (
+                              <select
+                                value={form.specFields[fk] || ''}
+                                onChange={e => setSpec(fk, e.target.value)}
+                                className="apf-spec-select"
+                              >
+                                <option value="">—</option>
+                                {options.map(o => <option key={o} value={o}>{o}</option>)}
+                              </select>
+                            ) : (
+                              <input
+                                value={form.specFields[fk] || ''}
+                                onChange={e => setSpec(fk, e.target.value)}
+                                placeholder={placeholder}
+                                className="apf-spec-input"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div style={{ padding: '30px 20px', textAlign: 'center', color: '#bbb', fontSize: 14 }}>
+                  კატეგორია არჩეულის შემდეგ მახასიათებლები გამოჩნდება
+                </div>
+              )}
             </div>
 
           </div>
