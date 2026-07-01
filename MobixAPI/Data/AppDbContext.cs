@@ -15,6 +15,8 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<BenefitItem> Benefits => Set<BenefitItem>();
+    public DbSet<AgentChat> AgentChats => Set<AgentChat>();
+    public DbSet<AgentMessage> AgentMessages => Set<AgentMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

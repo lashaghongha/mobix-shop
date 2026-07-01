@@ -18,7 +18,8 @@
   flex-direction: column;
   padding: 14px 10px;
   gap: 8px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .agents-new-chat-btn {
   background: #c0152a;
@@ -66,6 +67,18 @@
   flex-shrink: 0;
 }
 .agents-agent-name { flex: 1; }
+.agents-expand-btn {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+.agents-expand-btn:hover { color: #fff; }
 
 .agents-chat-list {
   display: flex;

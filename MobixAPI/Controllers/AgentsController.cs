@@ -22,6 +22,94 @@ public class AgentsController : ControllerBase
         _cfg = cfg;
     }
 
+    // ── Chat history CRUD ──────────────────────────────────────────────────────
+
+    [HttpGet("chats/{agentId}")]
+    public async Task<IActionResult> GetChats(string agentId)
+    {
+        var chats = await _db.AgentChats
+            .Where(c => c.AgentId == agentId)
+            .OrderByDescending(c => c.UpdatedAt)
+            .Select(c => new {
+                c.Id, c.AgentId, c.Title, c.CreatedAt, c.UpdatedAt
+            })
+            .ToListAsync();
+        return Ok(chats);
+    }
+
+    [HttpGet("chats/{agentId}/{chatId:int}/messages")]
+    public async Task<IActionResult> GetMessages(string agentId, int chatId)
+    {
+        var chat = await _db.AgentChats
+            .Include(c => c.Messages)
+            .FirstOrDefaultAsync(c => c.Id == chatId && c.AgentId == agentId);
+        if (chat == null) return NotFound();
+        var messages = chat.Messages
+            .OrderBy(m => m.CreatedAt)
+            .Select(m => new {
+                m.Id, m.Role, m.Content, m.ActionsJson, m.CreatedAt
+            });
+        return Ok(messages);
+    }
+
+    [HttpPost("chats/{agentId}")]
+    public async Task<IActionResult> CreateChat(string agentId, [FromBody] CreateChatRequest req)
+    {
+        var chat = new AgentChat
+        {
+            AgentId = agentId,
+            Title = req.Title ?? "ახალი ჩატი"
+        };
+        _db.AgentChats.Add(chat);
+        await _db.SaveChangesAsync();
+        return Ok(new { chat.Id, chat.AgentId, chat.Title, chat.CreatedAt, chat.UpdatedAt });
+    }
+
+    [HttpPatch("chats/{agentId}/{chatId:int}")]
+    public async Task<IActionResult> UpdateChatTitle(string agentId, int chatId, [FromBody] UpdateChatRequest req)
+    {
+        var chat = await _db.AgentChats.FirstOrDefaultAsync(c => c.Id == chatId && c.AgentId == agentId);
+        if (chat == null) return NotFound();
+        if (!string.IsNullOrEmpty(req.Title)) chat.Title = req.Title;
+        chat.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return Ok(new { chat.Id, chat.Title, chat.UpdatedAt });
+    }
+
+    [HttpDelete("chats/{agentId}/{chatId:int}")]
+    public async Task<IActionResult> DeleteChat(string agentId, int chatId)
+    {
+        var chat = await _db.AgentChats
+            .Include(c => c.Messages)
+            .FirstOrDefaultAsync(c => c.Id == chatId && c.AgentId == agentId);
+        if (chat == null) return NotFound();
+        _db.AgentMessages.RemoveRange(chat.Messages);
+        _db.AgentChats.Remove(chat);
+        await _db.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpPost("chats/{agentId}/{chatId:int}/messages")]
+    public async Task<IActionResult> AddMessage(string agentId, int chatId, [FromBody] AddMessageRequest req)
+    {
+        var chat = await _db.AgentChats.FirstOrDefaultAsync(c => c.Id == chatId && c.AgentId == agentId);
+        if (chat == null) return NotFound();
+
+        var message = new AgentMessage
+        {
+            ChatId = chatId,
+            Role = req.Role,
+            Content = req.Content,
+            ActionsJson = req.ActionsJson ?? "[]"
+        };
+        _db.AgentMessages.Add(message);
+        chat.UpdatedAt = DateTime.UtcNow;
+        if (chat.Title == "ახალი ჩატი" && req.Role == "user" && req.Content.Length > 0)
+            chat.Title = req.Content.Length > 40 ? req.Content[..40] + "…" : req.Content;
+        await _db.SaveChangesAsync();
+        return Ok(new { message.Id, message.Role, message.Content, message.CreatedAt });
+    }
+
     // ── POST /api/admin/agents/chat ────────────────────────────────────────────
     [HttpGet("ping")]
     public IActionResult Ping()
@@ -46,41 +134,50 @@ public class AgentsController : ControllerBase
 
         // ── System prompt ──────────────────────────────────────────────────────
         var systemPrompt = """
-            შენ ხარ MobiX ონლაინ მაღაზიის AI ასისტენტი. ქართულ ენაზე პასუხობ.
+            შენ ხარ MobiX ონლაინ მაღაზიის AI სუპერ-ასისტენტი. ქართულ ენაზე პასუხობ.
+            შენ გაქვს ყველა შესაძლებლობა: პროდუქტის დამატება, ფასი, სტოკი, SEO, აღწერა, რეკლამა.
 
             კატეგორიის ID-ები (categoryId):
             1=სმარტფონები, 2=ლეპტოპები, 3=ტელევიზორები,
             4=ტაბლეტები, 5=აუდიო, 6=კამერები, 7=Gaming, 8=Smart Home.
 
             ════════════════════════════════════════════
-            ᲞᲠᲝᲓᲣᲥᲢᲘᲡ ᲓᲐᲛᲐᲢᲔᲑᲐ — სავალდებულო წესები:
+            ᲞᲠᲝᲓᲣᲥᲢᲘᲡ ᲓᲐᲛᲐᲢᲔᲑᲐ — სავალდებულო ნაბიჯები:
             ════════════════════════════════════════════
-            ᲙᲠᲘᲢᲘᲙᲣᲚᲘ #1 — ᲙᲐᲢᲔᲒᲝᲠᲘᲐ ᲞᲘᲠᲕᲔᲚᲘ:
-            `prepare_product_form`-ს გამოძახებამდე განსაზღვრე სწორი categoryId.
-            iPhone/Samsung/Xiaomi → 1 (სმარტფონები)
-            MacBook/Dell/HP ლეპტოპი → 2 (ლეპტოპები)
-            LG/Samsung TV → 3 (ტელევიზორები)
-            iPad/Galaxy Tab → 4 (ტაბლეტები)
-            AirPods/Sony ყურსასმენი/სპიკერი → 5 (აუდიო)
-            Canon/Sony/Nikon კამერა → 6 (კამერები)
-            PS5/Xbox/Nintendo → 7 (Gaming)
-            Google Nest/Echo/Philips Hue → 8 (Smart Home)
+            "დაამატე [პროდუქტი]" → გამოიძახე ეს ᲡᲐᲛᲘ tool თანმიმდევრობით:
+            1. `prepare_product_form` — Draft-ად შენახვა (სრული specs-ით)
+            2. `generate_description` — ქართული SEO-ოპტიმიზებული აღწერა
+            3. `generate_seo` — საძიებო საკვანძო სიტყვები
 
-            ᲙᲠᲘᲢᲘᲙᲣᲚᲘ #2 — ᲓᲐᲣᲧᲝᲕᲜᲔᲑᲚᲘᲕ მოქმედება:
-            "დაამატე [პროდუქტი]" → ᲓᲐᲣᲧᲝᲕᲜᲔᲑᲚᲘᲕ გამოიძახე `prepare_product_form`.
-            ᲐᲠᲐᲡᲝᲓᲔᲡ ჰკითხო ფასი, სპეციფიკაცია ან სხვა. შენ ყველაფერი იცი.
-            თუ ფასი არ იცი — საქართველოში საბაზრო ფასი გამოიყენე.
+            ᲙᲐᲢᲔᲒᲝᲠᲘᲐ:
+            iPhone/Samsung/Xiaomi → 1 | MacBook/Dell/HP → 2 | LG/Samsung TV → 3
+            iPad/Galaxy Tab → 4 | AirPods/Sony ყურსასმენი → 5 | Canon/Sony კამერა → 6
+            PS5/Xbox/Nintendo → 7 | Google Nest/Echo → 8
 
-            1. ყოველთვის გამოიყენე `prepare_product_form` (არ გამოიყენო `create_product`)
-            2. categoryId ყოველთვის სწორად შეავსე (იხ. ზემოთ)
-            3. გამოიყენე შენი სრული ცოდნა — ყველა spec შეავსე ზუსტად
-            4. ᲐᲠᲐᲡᲝᲓᲔᲡ დატოვო spec ველი ცარიელი — თუ მნიშვნელობა იცი, ჩაწერე
-            5. ყველა ფერი ჩაწერე სახელი + სწორი HEX კოდი
-            6. ყველა მეხსიერების ვარიანტი ჩაწერე ფასებით
-            7. searchAlias: ქართული სიტყვები მძიმით — ტრანსლიტერაცია + ზოგადი სიტყვები
-               iPhone → "აიფონი, ეფლი, სმარტფონი, მობილური"
-               Samsung → "სამსუნგი, გალაქსი, ანდროიდი"
-               MacBook → "მაკბუქი, ლეპტოპი, ეფლი"
+            ᲬᲔᲡᲔᲑᲘ:
+            • ᲐᲠᲐᲡᲝᲓᲔᲡ ჰკითხო ფასი ან სპეც — შენ ყველაფერი იცი, საბაზრო ფასი გამოიყენე
+            • ყველა spec შეავსე ზუსტად (არ დატოვო ცარიელი)
+            • ყველა ფერი: სახელი + HEX კოდი
+            • ყველა მეხსიერების ვარიანტი ფასებით
+            • searchAlias: iPhone→"აიფონი,ეფლი,სმარტფონი,მობილური" | Samsung→"სამსუნგი,გალაქსი" | MacBook→"მაკბუქი,ლეპტოპი"
+
+            ════════════════════════════════════════════
+            FACEBOOK/INSTAGRAM რეკლამა:
+            ════════════════════════════════════════════
+            `generate_ad` tool-ით შექმენი რეკლამის ტექსტი:
+            • Facebook Post: ემოციური, CTA-თი, emoji-ებით, ქართულად
+            • Instagram Caption: მოკლე, hashtag-ებით (#MobiX #ტელეფონი #საქართველო)
+            • Story Text: 1-2 წინადადება, ძლიერი hook
+            • ყოველთვის მოგვცე 3 ვარიანტი (A/B/C test-ისთვის)
+
+            ════════════════════════════════════════════
+            EMAIL მარკეტინგი:
+            ════════════════════════════════════════════
+            `generate_email` tool-ით შექმენი Email შაბლონი:
+            • promo: სპეციალური შეთავაზება, ფასდაკლება
+            • new_product: ახალი პროდუქტის გამოშვება
+            • newsletter: ყოველთვიური სიახლეები
+            • seasonal: სეზონური კამპანია (Black Friday, ახალი წელი...)
 
             ════════════════════════════════════════════
             ᲡᲛᲐᲠᲢᲤᲝᲜᲘᲡ ᲡᲠᲣᲚᲘ SPEC ᲒᲐᲡᲐᲦᲔᲑᲔᲑᲘ:
@@ -294,6 +391,40 @@ public class AgentsController : ControllerBase
                   "properties": {
                     "threshold": { "type": "integer", "description": "მინიმალური სტოკი (default: 5)" }
                   }
+                }
+                """)
+            ),
+
+            ChatTool.CreateFunctionTool(
+                "generate_email",
+                "Email მარკეტინგის შაბლონის გენერაცია ქართულად",
+                BinaryData.FromString("""
+                {
+                  "type": "object",
+                  "properties": {
+                    "subject":   { "type": "string", "description": "Email-ის თემა" },
+                    "type":      { "type": "string", "description": "promo / newsletter / new_product / seasonal", "default": "promo" },
+                    "product":   { "type": "string", "description": "პროდუქტი ან თემა" },
+                    "discount":  { "type": "string", "description": "ფასდაკლება (optional, მაგ: 20%)" }
+                  },
+                  "required": ["product"]
+                }
+                """)
+            ),
+
+            ChatTool.CreateFunctionTool(
+                "generate_ad",
+                "Facebook/Instagram/Story რეკლამის ტექსტის გენერაცია ქართულად",
+                BinaryData.FromString("""
+                {
+                  "type": "object",
+                  "properties": {
+                    "productName": { "type": "string", "description": "პროდუქტის სახელი" },
+                    "price":       { "type": "string",  "description": "ფასი (მაგ: 3999₾)" },
+                    "platform":    { "type": "string",  "description": "facebook / instagram / story / all", "default": "all" },
+                    "highlight":   { "type": "string",  "description": "მთავარი უპირატესობა (optional)" }
+                  },
+                  "required": ["productName"]
                 }
                 """)
             ),
@@ -577,6 +708,101 @@ public class AgentsController : ControllerBase
                         new AgentAction { Agent = "Inventory Agent", Action = "low_stock_check", Summary = $"{low.Count} პროდუქტი დაბალი სტოკით" });
                 }
 
+                case "generate_email":
+                {
+                    var product  = args.GetStringOrDefault("product");
+                    var discount = args.GetStringOrDefault("discount", "");
+                    var type     = args.GetStringOrDefault("type", "promo");
+                    var discStr  = string.IsNullOrEmpty(discount) ? "" : $" — {discount} ფასდაკლება";
+
+                    var email = $"""
+                        📧 **Subject:** {(string.IsNullOrEmpty(args.GetStringOrDefault("subject")) ? $"🔥 {product}{discStr} | MobiX" : args.GetStringOrDefault("subject"))}
+
+                        ---
+
+                        გამარჯობა [სახელი],
+
+                        {(type == "new_product"
+                            ? $"სიახლე MobiX-ში! 🎉\n\n{product} — ახლა ხელმისაწვდომია ჩვენს მაღაზიაში."
+                            : type == "newsletter"
+                            ? $"MobiX-ის ამ კვირის საუკეთესო შეთავაზებები:\n\n🏆 {product}"
+                            : $"სპეციალური შეთავაზება მხოლოდ შენთვის! 🎯\n\n{product}{discStr}"
+                        )}
+
+                        ✅ უფასო მიტანა 500₾-ზე მეტ შეკვეთაზე
+                        🛡️ 24 თვე ოფიციალური გარანტია
+                        💳 0% განვადება 12 თვეზე
+
+                        👉 [შეუკვეთე ახლა](https://mobix.ge)
+
+                        ---
+                        პატივისცემით,
+                        MobiX გუნდი
+                        📞 +995 XXX XXX XXX | mobix.ge
+                        """;
+
+                    return (email,
+                        new AgentAction { Agent = "Email Agent", Action = "generate_email", Summary = $"'{product}' Email შაბლონი გენერირდა" });
+                }
+
+                case "generate_ad":
+                {
+                    var pName    = args.GetStringOrDefault("productName");
+                    var price    = args.GetStringOrDefault("price", "");
+                    var platform = args.GetStringOrDefault("platform", "all");
+                    var highlight= args.GetStringOrDefault("highlight", "");
+                    var priceStr = string.IsNullOrEmpty(price) ? "" : $" — მხოლოდ {price}";
+
+                    var fb = $"""
+                        📱 **Facebook Post — ვარიანტი A:**
+                        🔥 {pName}{priceStr}!
+                        {(string.IsNullOrEmpty(highlight) ? "პრემიუმ ხარისხი, საქართველოს საუკეთესო ფასად." : highlight)}
+                        ✅ სწრაფი მიტანა | 🛡️ 24 თვე გარანტია | 💳 0% განვადება 12 თვეზე
+                        შეუკვეთე ახლავე 👉 mobix.ge
+
+                        📱 **Facebook Post — ვარიანტი B:**
+                        გინდა {pName}? 🤔
+                        MobiX-ში ნახავ საუკეთესო შეთავაზებას{priceStr} ✨
+                        📦 დღეს შეუკვეთე — ხვალ მიიღე!
+                        👇 ბმული კომენტარში
+
+                        📱 **Facebook Post — ვარიანტი C:**
+                        💥 ნუ გამოტოვებ!
+                        {pName}{priceStr} — MobiX-ის ექსკლუზიური შეთავაზება 🎯
+                        🚀 სტოკი შეზღუდულია! დაჯავშნე ახლავე.
+                        """;
+
+                    var ig = $"""
+                        📸 **Instagram Caption — ვარიანტი A:**
+                        {pName} ✨{priceStr}
+                        პრემიუმ ტექნოლოგია, ქართული ფასით 🇬🇪
+                        #MobiX #ტელეფონი #საქართველო #{pName.Replace(" ", "")} #ონლაინშოპინგი #ტექნოლოგია
+
+                        📸 **Instagram Caption — ვარიანტი B:**
+                        upgrade time? 📲
+                        {pName}{priceStr} — mobix.ge-ზე 🛒
+                        #MobiX #tech #Georgia #smartphone #shopping
+                        """;
+
+                    var story = $"""
+                        🎬 **Story — ვარიანტი A:**
+                        {pName}{priceStr} 🔥 დღეს MobiX-ში!
+
+                        🎬 **Story — ვარიანტი B:**
+                        📦 ახალი შეთავაზება! {pName} — mobix.ge
+                        """;
+
+                    var result2 = platform switch {
+                        "facebook"  => fb,
+                        "instagram" => ig,
+                        "story"     => story,
+                        _           => fb + "\n\n" + ig + "\n\n" + story
+                    };
+
+                    return (result2,
+                        new AgentAction { Agent = "Ad Agent", Action = "generate_ad", Summary = $"'{pName}' რეკლამა გენერირდა" });
+                }
+
                 case "generate_description":
                 {
                     var pName2 = args.GetStringOrDefault("productName");
@@ -602,6 +828,9 @@ public class AgentsController : ControllerBase
 
 // ── DTOs ───────────────────────────────────────────────────────────────────────
 public record AgentChatRequest(string Message, List<ChatHistoryItem> History);
+public record CreateChatRequest(string? Title);
+public record UpdateChatRequest(string? Title);
+public record AddMessageRequest(string Role, string Content, string? ActionsJson);
 public record ChatHistoryItem(string Role, string Content);
 public class AgentChatResponse
 {
