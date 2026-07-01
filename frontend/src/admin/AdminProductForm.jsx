@@ -296,6 +296,40 @@ export default function AdminProductForm() {
       )}
 
       <form onSubmit={handleSubmit}>
+
+        {/* ── Step 1: Category picker (always visible) ── */}
+        {!isEdit && (
+          <div className="adm-card" style={{ marginBottom: 18 }}>
+            <div className="adm-card-title" style={{ marginBottom: 12 }}>
+              {form.categoryId ? '✅ კატეგორია არჩეულია' : '1. ჯერ აირჩიე კატეგორია'}
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {categories.map(c => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setField('categoryId', String(c.id))}
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: 10,
+                    border: form.categoryId === String(c.id) ? '2px solid #c0152a' : '2px solid #e5e7eb',
+                    background: form.categoryId === String(c.id) ? '#fff1f2' : '#fff',
+                    color: form.categoryId === String(c.id) ? '#c0152a' : '#444',
+                    fontWeight: form.categoryId === String(c.id) ? 700 : 500,
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    transition: 'all .15s',
+                  }}
+                >
+                  {c.nameGe}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Rest of form (only after category chosen) ── */}
+        {(form.categoryId || isEdit) && (
         <div className="apf-layout">
 
           {/* ── Left column ── */}
@@ -321,12 +355,14 @@ export default function AdminProductForm() {
                 <Field label="ბრენდი *">
                   <input value={form.brand} onChange={e => setField('brand', e.target.value)} placeholder="Apple" required />
                 </Field>
-                <Field label="კატეგორია *">
-                  <select value={form.categoryId} onChange={e => setField('categoryId', e.target.value)} required>
-                    <option value="">აირჩიე...</option>
-                    {categories.map(c => <option key={c.id} value={c.id}>{c.nameGe}</option>)}
-                  </select>
-                </Field>
+                {isEdit && (
+                  <Field label="კატეგორია *">
+                    <select value={form.categoryId} onChange={e => setField('categoryId', e.target.value)} required>
+                      <option value="">აირჩიე...</option>
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.nameGe}</option>)}
+                    </select>
+                  </Field>
+                )}
                 <Field label="აღწერა">
                   <textarea value={form.description} onChange={e => setField('description', e.target.value)} placeholder="პროდუქტის სრული აღწერა..." />
                 </Field>
@@ -588,6 +624,8 @@ export default function AdminProductForm() {
 
           </div>
         </div>
+
+        )} {/* end category-dependent block */}
 
         {/* Submit */}
         <div style={{ marginTop: 20, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
