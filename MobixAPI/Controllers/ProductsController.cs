@@ -87,11 +87,13 @@ public class ProductsController : ControllerBase
     [HttpGet("deals")]
     public async Task<IActionResult> GetDeals()
     {
-        var products = await _db.Products
+        var discounted = await _db.Products
             .Where(p => p.IsPublished && p.OldPrice.HasValue)
+            .ToListAsync();
+        var products = discounted
             .OrderByDescending(p => p.OldPrice - p.Price)
             .Take(8)
-            .ToListAsync();
+            .ToList();
         return Ok(products);
     }
 

@@ -53,11 +53,14 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
 
-    // Add Benefits table if it doesn't exist (for existing databases)
+    // Schema is managed via EnsureCreated() + idempotent raw-SQL patches below
+    // (the project does not run EF migrations at runtime). Each patch is safe to
+    // re-run on an already-populated database.
     var isPostgres = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL"));
     if (isPostgres)
     {
         db.Database.ExecuteSqlRaw(@"ALTER TABLE ""Products"" ADD COLUMN IF NOT EXISTS ""SearchAlias"" TEXT NOT NULL DEFAULT ''");
+        db.Database.ExecuteSqlRaw(@"ALTER TABLE ""Products"" ADD COLUMN IF NOT EXISTS ""InstallmentMonths"" INTEGER NOT NULL DEFAULT 12");
         db.Database.ExecuteSqlRaw(@"
             CREATE TABLE IF NOT EXISTS ""Benefits"" (
                 ""Id"" SERIAL PRIMARY KEY,
@@ -67,6 +70,26 @@ using (var scope = app.Services.CreateScope())
                 ""Order"" INTEGER NOT NULL DEFAULT 0
             );
         ");
+        db.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS ""AgentChats"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""AgentId"" TEXT NOT NULL DEFAULT '',
+                ""Title"" TEXT NOT NULL DEFAULT '',
+                ""CreatedAt"" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                ""UpdatedAt"" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        ");
+        db.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS ""AgentMessages"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""ChatId"" INTEGER NOT NULL REFERENCES ""AgentChats""(""Id"") ON DELETE CASCADE,
+                ""Role"" TEXT NOT NULL DEFAULT '',
+                ""Content"" TEXT NOT NULL DEFAULT '',
+                ""ActionsJson"" TEXT NOT NULL DEFAULT '[]',
+                ""CreatedAt"" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        ");
+
         // Seed default benefits if empty
         var count = db.Benefits.Count();
         if (count == 0)
@@ -79,6 +102,18 @@ using (var scope = app.Services.CreateScope())
                 ('💳', '0% განვადება', '12 თვეზე', 4);
             ");
         }
+    }
+    else
+    {
+        // Local SQLite: EnsureCreated() won't add columns to a pre-existing file.
+        // SQLite lacks "ADD COLUMN IF NOT EXISTS", so guard each ALTER individually.
+        static void AddColumnIfMissing(AppDbContext ctx, string table, string column, string ddl)
+        {
+            try { ctx.Database.ExecuteSqlRaw($"ALTER TABLE \"{table}\" ADD COLUMN {ddl}"); }
+            catch (Microsoft.Data.Sqlite.SqliteException) { /* duplicate column — already present */ }
+        }
+        AddColumnIfMissing(db, "Products", "SearchAlias", "\"SearchAlias\" TEXT NOT NULL DEFAULT ''");
+        AddColumnIfMissing(db, "Products", "InstallmentMonths", "\"InstallmentMonths\" INTEGER NOT NULL DEFAULT 12");
     }
 }
 
